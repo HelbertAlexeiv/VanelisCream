@@ -11,7 +11,7 @@ Sistema web para gestión de pedidos de una heladería multimarca.
 
 ### 1. Clonar repositorio
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/HelbertAlexeiv/VanelisCream.git
 cd VanelisCream
 ```
 
