@@ -14,7 +14,7 @@ class Rol(models.Model):
     
 class Usuario(AbstractUser):
 
-    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name="usuarios")
+    rol = models.ForeignKey(Rol, on_delete=models.PROTECT, related_name="usuarios", null=True, blank=True)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     direccion = models.CharField(max_length=100, blank=True, null=True)
 
