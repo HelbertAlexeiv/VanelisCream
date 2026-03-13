@@ -7,6 +7,7 @@ from django.db.models import F, Q
 from .models import Marca, Presentacion, Producto
 from .serializers import MarcaSerializer, PresentacionSerializer, ProductoSerializer
 
+#falta paginacion de tamaño 10
 class MarcaViewSet(viewsets.ModelViewSet):
     queryset = Marca.objects.all()
     serializer_class = MarcaSerializer
