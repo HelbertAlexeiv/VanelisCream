@@ -24,7 +24,7 @@ venv\Scripts\activate  # Windows
 ### 3. Instalar dependencias
 ```bash
 cd backend
-pip install requirements.txt
+pip install -r requirements.txt
 ```
 
 ### 4. Base de datos PostgreSQL
