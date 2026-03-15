@@ -43,10 +43,11 @@ DB_PASSWORD=tu_contraseña_real
 
 ### 5. Migraciones
 ```bash
-python manage.py makemigrations
 python manage.py migrate
 python manage.py createsuperuser
 ```
+> Nota: Solo se ejecuta "makemigrations" cuando por ejemplo se alteran los atributos de las tablas, y se usa "migrate" cuando por ejemplo hacen un pull
+> por primera vez
 
 ### 6. Ejecutar servidor
 ```bash

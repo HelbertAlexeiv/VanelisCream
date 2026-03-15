@@ -40,7 +40,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
         if precio_max:
             queryset = queryset.filter(precio__lte=precio_max)
         if busqueda:
-            # Busca la palabra tanto en el nombre COMO en la descripción usando Q objects para hacer un "OR"
+            # Busca la palabra tanto en el nombre como en la descripción usando Q objects para hacer un "OR"
             queryset = queryset.filter(
                 Q(nombre__icontains=busqueda) | Q(descripcion__icontains=busqueda)
             )
