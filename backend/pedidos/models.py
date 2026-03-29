@@ -30,17 +30,22 @@ class Pedido(models.Model):
     
     def actualizar_total(self):
         total = self.detalles.aggregate(
-            total=Sum(F("producto__precio") * F("cantidad"))
+            total=Sum(F("precio_unitario") * F("cantidad"))
         )["total"] or 0
 
         self.total_pedido = total
-        self.save()
-
+        self.save(update_fields=["total_pedido"])
+        
 class DetallePedido(models.Model):
 
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name="detalles")
     producto = models.ForeignKey('catalogo.Producto', on_delete=models.PROTECT, related_name="detalles_pedido")
     cantidad = models.PositiveIntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+
+    @property
+    def subtotal(self):
+        return self.precio_unitario * self.cantidad
 
     class Meta:
         db_table = "detalle_pedido"
