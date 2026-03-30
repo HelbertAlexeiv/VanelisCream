@@ -111,9 +111,9 @@ WITH data (nombre, descripcion, precio, imagen, stock, marca_nombre, presentacio
     ('Helado Brownie Colanta X 1 Lt', 'Helado de brownie elaborado principalmente con leche entera', 24400.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2020/01/1-Litro-Helado-Colanta-de-BROWNIE-PRESENTACIONES-1000x1000.png', 50, 'Colanta', 'Litro'),
     ('Helado Chocolate Colanta X 1 Lt', 'Helado de chocolate elaborado principalmente con leche entera', 24400.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2020/01/1-Litro-Helado-Colanta-de-CHOCOLATE-1000x1000.jpg', 50, 'Colanta', 'Litro'),
     ('Helado Vainilla Chips Colanta X 1 Lt', 'Helado de vainilla chips elaborado principalmente con leche entera', 24400.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2021/10/Vainilla-chips-1L.jpg', 50, 'Colanta', 'Litro'),
-    ('Helado Chocolate Colanta X 5 Lt', 'Helado de chocolate elaborado principalmente con leche entera', 45900.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2020/01/05-Litro-Helado-Colanta-de-CHOCOLATE-1000x1000.png', 50, 'Colanta', 'Litro'),
-    ('Helado Brownie Colanta X 5 Lt', 'Helado de brownie elaborado principalmente con leche entera', 45900.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2020/01/5-Litros-Helado-Colanta-de-BROWNIE-PRESENTACIONES-1000x1000.png', 50, 'Colanta', 'Litro'),
-    ('Helado Vainilla Chips Colanta X 5 Lt', 'Helado de vainilla chips elaborado principalmente con leche entera', 45900.00, 'https://colanta.com/sabe-mas/wp-content/uploads/2021/10/Helado-Sabor-Vainilla-Chips.png', 50, 'Colanta', 'Litro')
+    ('Helado Chocolate Colanta X 5 Lt', 'Helado de chocolate elaborado principalmente con leche entera', 45900.00, 'https://colanta.com/sabe-mas/wp-content/uploads/Chocolate-5L-informacion-nutricional.png', 50, 'Colanta', 'Litro'),
+    ('Helado Brownie Colanta X 5 Lt', 'Helado de brownie elaborado principalmente con leche entera', 45900.00, 'https://colanta.com/sabe-mas/wp-content/uploads/Brownie-5L-informacion-nutricional-1.png', 50, 'Colanta', 'Litro'),
+    ('Helado Vainilla Chips Colanta X 5 Lt', 'Helado de vainilla chips elaborado principalmente con leche entera', 45900.00, 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT3kgDJI7uLlre0JtisAPsFkq1vooMSZ752OpJEbQCcJQ&s', 50, 'Colanta', 'Litro')
 )
 INSERT INTO producto (nombre, descripcion, precio, imagen, stock, marca_id, presentacion_id)
 SELECT
