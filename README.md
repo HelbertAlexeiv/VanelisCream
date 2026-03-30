@@ -69,3 +69,33 @@ python manage.py runserver
 ```
 
 Servidor disponible en: http://localhost:8000
+
+## Autenticacion
+
+Endpoints de autenticacion:
+
+- POST /api/auth/registro/
+- POST /api/auth/login/
+- GET /api/auth/me/
+
+Body JSON para login:
+- Body JSON:
+
+```json
+{
+	"username": "tu_usuario",
+	"password": "tu_password"
+}
+```
+
+Respuesta exitosa:
+
+```json
+{
+	"token": "<token>"
+}
+```
+
+Para endpoints protegidos, enviar el token en el header:
+
+Authorization: Token <token>

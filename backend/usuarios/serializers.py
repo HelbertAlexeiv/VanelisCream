@@ -1,4 +1,4 @@
-from django.contrib.auth import authenticate, password_validation
+from django.contrib.auth import password_validation
 from rest_framework import serializers
 
 from .models import Rol, Usuario
@@ -66,23 +66,3 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
         usuario.set_password(password)
         usuario.save()
         return usuario
-
-
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, attrs):
-        user = authenticate(
-            username=attrs.get("username"),
-            password=attrs.get("password"),
-        )
-
-        if not user:
-            raise serializers.ValidationError("Credenciales invalidas.")
-
-        if not user.is_active:
-            raise serializers.ValidationError("El usuario esta inactivo.")
-
-        attrs["user"] = user
-        return attrs
