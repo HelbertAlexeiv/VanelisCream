@@ -49,7 +49,21 @@ python manage.py createsuperuser
 > Nota: Solo se ejecuta "makemigrations" cuando por ejemplo se alteran los atributos de las tablas, y se usa "migrate" cuando por ejemplo hacen un pull
 > por primera vez
 
-### 6. Ejecutar servidor
+### 6. Cargar datos iniciales del catalogo
+
+Despues de migrar la base de datos, cargar los datos semilla con el fixture versionado:
+
+```bash
+python manage.py loaddata fixtures/catalogo_datos.json
+```
+
+Opcional (respaldo): ejecutar el script SQL idempotente:
+
+```bash
+psql -U <nombre_usuario> -h localhost -d vaneliscream -f fixtures/seed_catalogo.sql
+```
+
+### 7. Ejecutar servidor
 ```bash
 python manage.py runserver
 ```
