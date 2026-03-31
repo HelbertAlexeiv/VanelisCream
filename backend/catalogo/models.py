@@ -33,7 +33,7 @@ class Producto(models.Model):
     marca = models.ForeignKey(Marca, on_delete=models.PROTECT, related_name="productos")
     presentacion = models.ForeignKey(Presentacion, on_delete=models.PROTECT, related_name="productos")
     precio = models.DecimalField(max_digits=10,decimal_places=2)
-    imagen = models.URLField(max_length=500, blank=True, null=True)
+    imagen = models.URLField(max_length=1000, blank=True, null=True)
     stock = models.PositiveIntegerField()
 
     class Meta:
