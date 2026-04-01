@@ -10,8 +10,7 @@ from .models import EstadoPedido, Pedido
 from .serializers import PedidoCreateSerializer, PedidoSerializer
 
 class PedidoViewSet(viewsets.ModelViewSet):
-    queryset = Pedido.objects.all()
-
+    queryset = Pedido.objects.select_related('estado', 'cliente', 'empleado',).prefetch_related('detalles')
     permission_classes = [IsAuthenticated]
 
     def get_serializer_class(self):
@@ -22,8 +21,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:
-            return Pedido.objects.all()
-        return Pedido.objects.filter(cliente=user)
+            return self.queryset
+        return self.queryset.filter(cliente=user)
 
     @action(detail=True, methods=['post'])
     def cancelar(self, request, pk=None):
