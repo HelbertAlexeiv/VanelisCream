@@ -2,12 +2,21 @@ from rest_framework import viewsets
 from django_filters import rest_framework as filters
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .models import Marca, Presentacion, Producto
 from .serializers import MarcaSerializer, PresentacionSerializer, ProductoSerializer
 from django.db.models import Q
+
+
+class ProductoPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+
 #filtros para productos
 class ProductoFilter(filters.FilterSet):
     precio_min = filters.NumberFilter(field_name="precio", lookup_expr="gte")
@@ -39,6 +48,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
     serializer_class = ProductoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductoFilter
+    pagination_class = ProductoPagination
     # permission_classes = [IsAuthenticated]
 
     # endpoint para ver los que tienen poco stock (<= 10)
