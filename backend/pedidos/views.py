@@ -13,8 +13,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from inventario.services import InventarioService
 
 from .models import EstadoPedido, Pedido
-from .serializers import PedidoCreateSerializer, PedidoSerializer
+from .serializers import PedidoCreateSerializer, PedidoSerializer, EstadoPedidoSerializer
 
+class EstadoPedidoViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = EstadoPedido.objects.all()
+    serializer_class = EstadoPedidoSerializer
+    permission_classes = [IsAuthenticated]
 
 class PedidoPagination(PageNumberPagination):
     page_size = 10
