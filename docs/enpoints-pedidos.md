@@ -2,7 +2,30 @@ Pedidos
 
 Listar todos los pedidos: GET /api/pedidos/
 
-Crear un pedido: POST /api/pedidos/
+Crear un pedido: 
+
+POST /api/pedidos/
+
+Ejemplo de body:
+
+{
+  "direccion_entrega": "Calle 123",
+  "total_pedido": 25000,
+  "detalles": [
+    {
+      "producto": 66,
+      "cantidad": 2,
+      "precio_unitario": 8000,
+      "subtotal": 16000
+    },
+    {
+      "producto": 67,
+      "cantidad": 1,
+      "precio_unitario": 9000,
+      "subtotal": 9000
+    }
+  ]
+}
 
 Obtener un pedido específico: GET /api/pedidos/<id>/
 
