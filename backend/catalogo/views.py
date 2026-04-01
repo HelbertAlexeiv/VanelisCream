@@ -7,7 +7,7 @@ from rest_framework.response import Response
 
 from .models import Marca, Presentacion, Producto
 from .serializers import MarcaSerializer, PresentacionSerializer, ProductoSerializer
-
+from django.db.models import Q
 #filtros para productos
 class ProductoFilter(filters.FilterSet):
     precio_min = filters.NumberFilter(field_name="precio", lookup_expr="gte")
@@ -19,7 +19,9 @@ class ProductoFilter(filters.FilterSet):
         fields = ["marca", "presentacion", "precio_min", "precio_max", "q"]
 
     def filtrar_busqueda(self, queryset, name, value):
-        return queryset.filter(nombre__icontains=value) | queryset.filter(descripcion__icontains=value)
+        return queryset.filter(
+            Q(nombre__icontains=value) |
+            Q(descripcion__icontains=value))
 
 #falta PAG
 class MarcaViewSet(viewsets.ModelViewSet):
@@ -59,29 +61,4 @@ class ProductoViewSet(viewsets.ModelViewSet):
         return Response({
             "descripcion": f"Productos con stock menor o igual a {umbral}",
             "resultados": serializer.data
-        })
-
-    # endpoint para notificacion inicial de productos con stock bajo
-    @action(
-        detail=False,
-        methods=['get'],
-        permission_classes=[IsAuthenticated],
-        url_path='alerta_stock_bajo',
-        url_name='alerta-stock-bajo',
-    )
-    def alerta_stock_bajo(self, request):
-        umbral = request.query_params.get('umbral', 15)
-        try:
-            umbral = int(umbral)
-        except ValueError:
-            umbral = 10
-
-        productos_bajo_stock = Producto.objects.select_related('marca', 'presentacion').filter(stock__lte=umbral)
-        serializer = self.get_serializer(productos_bajo_stock, many=True)
-
-        return Response({
-            "hay_alertas": productos_bajo_stock.exists(),
-            "total_productos_bajo_stock": productos_bajo_stock.count(),
-            "umbral": umbral,
-            "productos": serializer.data,
         })
