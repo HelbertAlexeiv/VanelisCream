@@ -1,5 +1,6 @@
 NO requieren autentificacion:
 
+</br>
 
 MARCAS
 
@@ -7,14 +8,14 @@ Listar todas las marcas: GET /api/catalogo/marcas/
 
 Crear una marca: POST /api/catalogo/marcas/
 
-Obtener una marca específica: GET /api/catalogo/marcas/<id>/
+Obtener una marca específica: GET /api/catalogo/marcas/id/
 
-Actualizar una marca: PUT /api/catalogo/marcas/<id>/
+Actualizar una marca: PUT /api/catalogo/marcas/id/
 
-Eliminar una marca: DELETE /api/catalogo/marcas/<id>/
+Eliminar una marca: DELETE /api/catalogo/marcas/id/
 
 
-
+</br>
 
 PRESENTACION
 
@@ -22,11 +23,11 @@ Listar todas las presentaciones: GET /api/catalogo/presentaciones/
 
 Crear una presentación: POST /api/catalogo/presentaciones/
 
-Obtener una presentación específica: GET /api/catalogo/presentaciones/<id>/
+Obtener una presentación específica: GET /api/catalogo/presentaciones/id/
 
-Actualizar una presentación: PUT /api/catalogo/presentaciones/<id>/
+Actualizar una presentación: PUT /api/catalogo/presentaciones/id/
 
-Eliminar una presentación: DELETE /api/catalogo/presentaciones/<id>/
+Eliminar una presentación: DELETE /api/catalogo/presentaciones/id/
 
 
 
@@ -38,15 +39,15 @@ Listar todos los productos: GET /api/catalogo/productos/
 
 Crear un producto: POST /api/catalogo/productos/
 
-Obtener un producto específico: GET /api/catalogo/productos/<id>/
+Obtener un producto específico: GET /api/catalogo/productos/id/
 
-Actualizar un producto: PUT /api/catalogo/productos/<id>/
+Actualizar un producto: PUT /api/catalogo/productos/id/
 
-Eliminar un producto: DELETE /api/catalogo/productos/<id>/
+Eliminar un producto: DELETE /api/catalogo/productos/id/
 
 Stock Bajo (Alerta): GET /api/catalogo/productos/stock_bajo/
 
-
+</br>
 
 
 FILTROS
@@ -74,13 +75,13 @@ GET /api/catalogo/productos/?marca=1&q=chocolate
 
 GET /api/catalogo/productos/?marca=4&presentacion=1&q=crema
 
-
+</br>
 
 ESTANDARIZADA-de todos los filtros posibles:
 
-GET /api/catalogo/productos/?marca=<id>&presentacion=<id>&precio_min=<n>&precio_max=<n>&q=<texto>
+GET /api/catalogo/productos/?marca=id&presentacion=id&precio_min=n&precio_max=n&q=texto
 
-
+</br>
 
 Requiere autentificcacion:
 
