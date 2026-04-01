@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils import timezone
 
 from rest_framework import viewsets
@@ -8,6 +9,8 @@ from rest_framework import status
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import PageNumberPagination
 from django_filters.rest_framework import DjangoFilterBackend
+
+from inventario.services import InventarioService
 
 from .models import EstadoPedido, Pedido
 from .serializers import PedidoCreateSerializer, PedidoSerializer
@@ -57,6 +60,61 @@ class PedidoViewSet(viewsets.ModelViewSet):
             return self.queryset
         return self.queryset.filter(cliente=user)
 
+
+
+    # acciones personalizadas para confirmar y cancelar pedidos y manejar el stock en cada caso
+    @action(detail=True, methods=['post'])
+    def confirmar(self, request, pk=None):
+        pedido = self.get_object()
+
+        if pedido.estado.nombre.lower() == 'recibido':
+            return Response(
+                {
+                    'detalle': 'El pedido ya se encuentra confirmado.'
+                },
+                status=status.HTTP_200_OK,
+            )
+
+        if pedido.estado.nombre.lower() == 'cancelado':
+            return Response(
+                {
+                    'detalle': 'No se puede confirmar un pedido cancelado.'
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        estado_recibido = EstadoPedido.objects.filter(nombre__iexact='recibido').first()
+        if not estado_recibido:
+            return Response(
+                {
+                    'detalle': 'No existe el estado recibido configurado.'
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
+
+        with transaction.atomic():
+            pedido.estado = estado_recibido
+            pedido.save(update_fields=['estado'])
+
+            exito, mensaje = InventarioService.descontar_stock_pedido(pedido.id, usuario=request.user.username)
+            if not exito:
+                return Response(
+                    {
+                        'detalle': mensaje,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        return Response(
+            {
+                'detalle': 'Pedido confirmado correctamente.'
+            },
+            status=status.HTTP_200_OK,
+        )
+
+
+
+
     @action(detail=True, methods=['post'])
     def cancelar(self, request, pk=None):
         pedido = self.get_object()
@@ -93,9 +151,19 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
+        # Reintegrar el stock antes de cambiar el estado del pedido
+        with transaction.atomic():
+            pedido.estado = estado_cancelado
+            pedido.save(update_fields=['estado'])
 
-        pedido.estado = estado_cancelado
-        pedido.save(update_fields=['estado'])
+            exito, mensaje = InventarioService.reintegrar_stock_pedido(pedido.id, usuario=request.user.username)
+            if not exito:
+                return Response(
+                    {
+                        'detalle': mensaje,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         return Response(
             {
