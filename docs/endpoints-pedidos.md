@@ -4,17 +4,17 @@ Listar todos los pedidos: GET /api/pedidos/
 
 Crear un pedido: POST /api/pedidos/
 
-Obtener un pedido específico: GET /api/pedidos/<id>/
+Obtener un pedido específico: GET /api/pedidos/\<id\>/
 
-Actualizar un pedido completo: PUT /api/pedidos/<id>/
+Actualizar un pedido completo: PUT /api/pedidos/\<id\>/
 
-Actualizar parcialmente un pedido: PATCH /api/pedidos/<id>/
+Actualizar parcialmente un pedido: PATCH /api/pedidos/\<id\>/
 
-Eliminar un pedido: DELETE /api/pedidos/<id>/
+Eliminar un pedido: DELETE /api/pedidos/\<id\>
 
-Confirmar un pedido: POST /api/pedidos/<id>/confirmar/
+Confirmar un pedido: POST /api/pedidos/\<id\>/confirmar/
 
-Cancelar un pedido: POST /api/pedidos/<id>/cancelar/
+Cancelar un pedido: POST /api/pedidos/\<id\>/cancelar/
 
 
 
