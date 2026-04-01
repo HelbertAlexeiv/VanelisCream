@@ -63,16 +63,16 @@ GET /api/catalogo/productos/?marca=2&presentacion=1
 
 Si el usuario escribe "vainilla" en el buscador de la página., busca si coinicde en el nombre o descricpioc:
 
-GET http://127.0.0.1:8000/api/catalogo/productos/?q=vainilla
+GET /api/catalogo/productos/?q=vainilla
 
 
 Combinar filtros:
 
 
-GET http://127.0.0.1:8000/api/catalogo/productos/?marca=1&q=chocolate
+GET /api/catalogo/productos/?marca=1&q=chocolate
 
 
-GET http://127.0.0.1:8000/api/catalogo/productos/?marca=4&presentacion=1&q=crema
+GET /api/catalogo/productos/?marca=4&presentacion=1&q=crema
 
 
 
