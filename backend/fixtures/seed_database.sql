@@ -221,4 +221,56 @@ SET
     marca_id = EXCLUDED.marca_id,
     presentacion_id = EXCLUDED.presentacion_id;
 
+-- ========================================
+-- 9. Insertar Pedidos de ejemplo (cliente)
+-- ========================================
+INSERT INTO pedido (
+    cliente_id,
+    empleado_id,
+    estado_id,
+    fecha_creacion,
+    fecha_limite_cancelacion,
+    direccion_entrega,
+    total_pedido
+)
+SELECT
+    u.id AS cliente_id,
+    NULL::bigint AS empleado_id,
+    e.id AS estado_id,
+    CURRENT_TIMESTAMP - INTERVAL '2 hours' AS fecha_creacion,
+    CURRENT_TIMESTAMP + INTERVAL '1 hour' AS fecha_limite_cancelacion,
+    'Calle 10 #5-50, Barrio Centro' AS direccion_entrega,
+    12500.00 AS total_pedido
+FROM usuario u
+JOIN estado_pedido e ON e.nombre = 'recibido'
+WHERE u.username = 'cliente'
+
+UNION ALL
+
+SELECT
+    u.id AS cliente_id,
+    NULL::bigint AS empleado_id,
+    e.id AS estado_id,
+    CURRENT_TIMESTAMP - INTERVAL '1 day' AS fecha_creacion,
+    NULL::timestamp with time zone AS fecha_limite_cancelacion,
+    'Cra 15 #24-33, Apto 203' AS direccion_entrega,
+    38900.00 AS total_pedido
+FROM usuario u
+JOIN estado_pedido e ON e.nombre = 'en camino'
+WHERE u.username = 'cliente'
+
+UNION ALL
+
+SELECT
+    u.id AS cliente_id,
+    NULL::bigint AS empleado_id,
+    e.id AS estado_id,
+    CURRENT_TIMESTAMP - INTERVAL '3 days' AS fecha_creacion,
+    NULL::timestamp with time zone AS fecha_limite_cancelacion,
+    'Calle 8 #12-90, Casa 4' AS direccion_entrega,
+    61900.00 AS total_pedido
+FROM usuario u
+JOIN estado_pedido e ON e.nombre = 'entregado'
+WHERE u.username = 'cliente';
+
 COMMIT;
