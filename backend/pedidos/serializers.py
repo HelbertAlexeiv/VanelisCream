@@ -2,7 +2,7 @@ from rest_framework import serializers
 from datetime import timedelta
 from django.db import transaction
 
-from .models import Pedido, DetallePedido, EstadoPedido
+from .models import AuditoriaPedido, Pedido, DetallePedido, EstadoPedido
 from usuarios.serializers import UsuarioRespuestaSerializer
 
 
@@ -74,3 +74,24 @@ class PedidoCreateSerializer(serializers.Serializer):
                 raise serializers.ValidationError({'detalle': mensaje})
 
             return pedido
+
+
+class PedidoEstadoUpdateSerializer(serializers.Serializer):
+    estado = serializers.PrimaryKeyRelatedField(queryset=EstadoPedido.objects.all())
+
+
+class AuditoriaPedidoSerializer(serializers.ModelSerializer):
+    pedido_id = serializers.IntegerField(source='pedido.id', read_only=True)
+
+    class Meta:
+        model = AuditoriaPedido
+        fields = [
+            'id',
+            'pedido_id',
+            'usuario',
+            'accion',
+            'campo_modificado',
+            'valor_anterior',
+            'valor_nuevo',
+            'fecha_evento',
+        ]
