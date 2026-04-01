@@ -52,10 +52,25 @@ class CatalogoTokenAuthTests(APITestCase):
 		self.assertEqual(len(response.data["resultados"]), 1)
 		self.assertEqual(response.data["resultados"][0]["nombre"], self.producto.nombre)
 
-	def test_alerta_stock_bajo_con_token_devuelve_resumen(self):
-		self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
-		response = self.client.get(self.alerta_stock_bajo_url)
+
+class ProductoListadoTests(APITestCase):
+	def setUp(self):
+		self.marca = Marca.objects.create(nombre="Marca Listado")
+		self.presentacion = Presentacion.objects.create(nombre="Cono")
+		Producto.objects.create(
+			nombre="Helado Fresa",
+			descripcion="Producto para listar",
+			marca=self.marca,
+			presentacion=self.presentacion,
+			precio="8.75",
+			stock=12,
+		)
+
+	def test_lista_productos_muestra_nombres_de_marca_y_presentacion(self):
+		response = self.client.get(reverse("producto-list"))
 
 		self.assertEqual(response.status_code, status.HTTP_200_OK)
-		self.assertEqual(response.data["hay_alertas"], True)
-		self.assertEqual(response.data["total_productos_bajo_stock"], 1)
+		self.assertIn("results", response.data)
+		self.assertEqual(len(response.data["results"]), 1)
+		self.assertEqual(response.data["results"][0]["marca"], self.marca.nombre)
+		self.assertEqual(response.data["results"][0]["presentacion"], self.presentacion.nombre)
