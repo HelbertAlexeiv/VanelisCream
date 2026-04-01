@@ -5,13 +5,46 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import EstadoPedido, Pedido
 from .serializers import PedidoCreateSerializer, PedidoSerializer
 
+
+class PedidoPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
 class PedidoViewSet(viewsets.ModelViewSet):
     queryset = Pedido.objects.select_related('estado', 'cliente', 'empleado',).prefetch_related('detalles')
     permission_classes = [IsAuthenticated]
+    pagination_class = PedidoPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_fields = {
+        'estado': ['exact'],
+        'estado__nombre': ['exact', 'icontains'],
+        'cliente': ['exact'],
+        'empleado': ['exact', 'isnull'],
+        'fecha_creacion': ['exact', 'gte', 'lte'],
+        'fecha_limite_cancelacion': ['exact', 'gte', 'lte', 'isnull'],
+        'total_pedido': ['exact', 'gte', 'lte'],
+    }
+    search_fields = [
+        'direccion_entrega',
+        'estado__nombre',
+        'cliente__username',
+        'empleado__username',
+    ]
+    ordering_fields = [
+        'id',
+        'fecha_creacion',
+        'fecha_limite_cancelacion',
+        'total_pedido',
+    ]
+    ordering = ['-fecha_creacion']
 
     def get_serializer_class(self):
         if self.action == 'create':
