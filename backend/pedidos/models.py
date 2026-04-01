@@ -1,6 +1,8 @@
 from django.db import models
 from django.db.models import Sum, F
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 class EstadoPedido(models.Model):
 
@@ -19,6 +21,7 @@ class Pedido(models.Model):
     empleado = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.PROTECT, related_name="pedidos_empleado", blank=True, null=True)
     estado = models.ForeignKey(EstadoPedido, on_delete=models.PROTECT, related_name="pedidos")
     fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_limite_cancelacion = models.DateTimeField(blank=True, null=True)
     direccion_entrega = models.CharField(max_length=200)
     total_pedido = models.DecimalField(max_digits=10, decimal_places=2)
 
@@ -28,19 +31,14 @@ class Pedido(models.Model):
     def __str__(self):
         return f"Pedido {self.id}"
     
-    def actualizar_total(self):
-        total = self.detalles.aggregate(
-            total=Sum(F("producto__precio") * F("cantidad"))
-        )["total"] or 0
-
-        self.total_pedido = total
-        self.save()
 
 class DetallePedido(models.Model):
 
     pedido = models.ForeignKey(Pedido, on_delete=models.CASCADE, related_name="detalles")
     producto = models.ForeignKey('catalogo.Producto', on_delete=models.PROTECT, related_name="detalles_pedido")
-    cantidad = models.PositiveIntegerField()
+    cantidad = models.PositiveIntegerField(null=True, blank=True)
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    subtotal = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     class Meta:
         db_table = "detalle_pedido"
