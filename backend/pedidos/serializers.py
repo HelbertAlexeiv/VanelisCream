@@ -38,7 +38,7 @@ class PedidoCreateSerializer(serializers.Serializer):
         detalles = [
             DetallePedido(
                 pedido=pedido,
-                producto_id=item['producto'],
+                producto=item['producto'],
                 cantidad=item['cantidad'],
                 precio_unitario=item['precio_unitario'],
                 subtotal=item['subtotal']
