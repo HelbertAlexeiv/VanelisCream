@@ -30,7 +30,7 @@ Actualizar una presentación: PUT /api/catalogo/presentaciones/id/
 Eliminar una presentación: DELETE /api/catalogo/presentaciones/id/
 
 
-
+</br>
 
 
 PRODUCTOS
@@ -66,6 +66,8 @@ Si el usuario escribe "vainilla" en el buscador de la página., busca si coinicd
 
 GET /api/catalogo/productos/?q=vainilla
 
+</br>
+
 
 Combinar filtros:
 
@@ -77,11 +79,13 @@ GET /api/catalogo/productos/?marca=4&presentacion=1&q=crema
 
 </br>
 
+
 ESTANDARIZADA-de todos los filtros posibles:
 
 GET /api/catalogo/productos/?marca=id&presentacion=id&precio_min=n&precio_max=n&q=texto
 
 </br>
+
 
 Requiere autentificcacion:
 
