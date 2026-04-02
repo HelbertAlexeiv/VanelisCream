@@ -88,6 +88,22 @@ Body JSON para login:
 }
 ```
 
+Por defecto estan las siguientes credenciales
+
+```json
+{
+	"username": "admin",
+	"password": "contraseña administrador"
+}
+```
+
+```json
+{
+	"username": "cliente",
+	"password": "contraseña cliente"
+}
+```
+
 Respuesta exitosa:
 
 ```json

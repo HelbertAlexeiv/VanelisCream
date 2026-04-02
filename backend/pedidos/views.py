@@ -15,12 +15,17 @@ from inventario.services import InventarioService
 from .models import EstadoPedido, Pedido
 from .models import AuditoriaPedido
 from .serializers import (
+    EstadoPedidoSerializer,
     AuditoriaPedidoSerializer,
     PedidoCreateSerializer,
     PedidoEstadoUpdateSerializer,
     PedidoSerializer,
 )
 
+class EstadoPedidoViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = EstadoPedido.objects.all()
+    serializer_class = EstadoPedidoSerializer
+    permission_classes = [IsAuthenticated]
 
 class PedidoPagination(PageNumberPagination):
     page_size = 10
