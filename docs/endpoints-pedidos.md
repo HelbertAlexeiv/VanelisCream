@@ -12,9 +12,13 @@ Actualizar parcialmente un pedido: PATCH /api/pedidos/\<id\>/
 
 Eliminar un pedido: DELETE /api/pedidos/\<id\>
 
+Actualizar estado de un pedido (solo admin): PATCH /api/pedidos/\<id\>/estado/
+
 Confirmar un pedido: POST /api/pedidos/\<id\>/confirmar/
 
 Cancelar un pedido: POST /api/pedidos/\<id\>/cancelar/
+
+Consultar auditoria de cambios de estado (solo admin): GET /api/pedidos/auditoria/
 
 
 
@@ -67,6 +71,14 @@ No requiere body.
 {}
 ```
 
+Body para actualizar estado de un pedido
+
+```json
+{
+  "estado": 3
+}
+```
+
 
 
 Paginación
@@ -106,6 +118,17 @@ Filtrar por total exacto: GET /api/pedidos/?total_pedido=25000
 Filtrar por total mínimo: GET /api/pedidos/?total_pedido__gte=10000
 
 Filtrar por total máximo: GET /api/pedidos/?total_pedido__lte=50000
+
+
+Auditoria de pedidos
+
+Listar auditoria (orden por fecha descendente por defecto): GET /api/pedidos/auditoria/
+
+Filtrar por pedido: GET /api/pedidos/auditoria/?pedido_id=15
+
+Ordenar auditoria: GET /api/pedidos/auditoria/?ordering=-fecha_evento
+
+Ordenar por multiples campos: GET /api/pedidos/auditoria/?ordering=usuario,-fecha_evento
 
 
 
@@ -150,3 +173,5 @@ Notas
 Todos los endpoints requieren autenticacion.
 
 En la respuesta de un pedido se incluyen `estado`, `cliente`, `empleado` y `detalles` ya resueltos.
+
+`PATCH /api/pedidos/<id>/estado/` y `GET /api/pedidos/auditoria/` requieren usuario administrador (`is_staff=true`).
