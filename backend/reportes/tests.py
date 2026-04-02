@@ -26,7 +26,7 @@ class DashboardReportesTests(APITestCase):
 		self.admin_token = Token.objects.create(user=self.admin)
 		self.cliente_token = Token.objects.create(user=self.cliente)
 
-		self.estado_pendiente = EstadoPedido.objects.create(nombre='pendiente')
+		self.estado_preparando = EstadoPedido.objects.create(nombre='preparando')
 		self.estado_recibido = EstadoPedido.objects.create(nombre='recibido')
 
 		marca = Marca.objects.create(nombre='Popsy')
@@ -57,7 +57,7 @@ class DashboardReportesTests(APITestCase):
 
 		self._crear_pedido(
 			fecha=now,
-			estado=self.estado_pendiente,
+			estado=self.estado_preparando,
 			total='10000.00',
 			detalles=[(self.producto_a, 2, '10000.00')],
 		)
@@ -107,11 +107,41 @@ class DashboardReportesTests(APITestCase):
 		self.assertIn('top_sellers', response.data)
 		self.assertIn('alertas', response.data)
 
-		self.assertEqual(response.data['resumen']['pedidos_pendientes'], 1)
+		estados_resumen = {
+			item['estado']: item['total']
+			for item in response.data['resumen']['pedidos_por_estado']
+		}
+		self.assertEqual(estados_resumen.get('preparando'), 1)
+		self.assertEqual(estados_resumen.get('recibido'), 1)
 		self.assertAlmostEqual(response.data['resumen']['ventas_mes'], 15000.0)
 		self.assertGreaterEqual(response.data['resumen']['pedidos_dia'], 1)
 		self.assertEqual(response.data['top_sellers'][0]['producto'], self.producto_a.nombre)
 		self.assertTrue(any(item['producto'] == self.producto_b.nombre for item in response.data['alertas']))
+
+	def test_dashboard_parametros_invalidos_retorna_400(self):
+		now = timezone.localtime(timezone.now())
+		response = self.client.get(
+			f'/api/reportes/dashboard/?periodo=xyz&anio={now.year}&mes=13',
+			HTTP_AUTHORIZATION=f'Token {self.admin_token.key}',
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(
+			response.data['detalle'],
+			'Parametro periodo invalido. Use: dia, semana o mes.',
+		)
+
+	def test_dashboard_anio_invalido_retorna_400(self):
+		response = self.client.get(
+			'/api/reportes/dashboard/?periodo=dia&anio=-1&mes=4',
+			HTTP_AUTHORIZATION=f'Token {self.admin_token.key}',
+		)
+
+		self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+		self.assertEqual(
+			response.data['detalle'],
+			'Parametro anio invalido. Debe estar entre 1 y 9999.',
+		)
 
 	def test_dashboard_no_admin_es_forbidden(self):
 		response = self.client.get(

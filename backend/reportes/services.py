@@ -2,7 +2,7 @@ from calendar import monthrange
 from datetime import date, datetime, time, timedelta
 from decimal import Decimal
 
-from django.db.models import DecimalField, ExpressionWrapper, F, Sum, Value
+from django.db.models import Count, DecimalField, ExpressionWrapper, F, Sum, Value
 from django.db.models.functions import Coalesce, TruncDate, TruncMonth, TruncWeek
 from django.utils import timezone
 
@@ -102,9 +102,6 @@ class ReportesService:
 
 		year_value = ReportesService._parse_int(anio, current_year)
 		month_value = ReportesService._parse_int(mes, current_month)
-		if month_value < 1 or month_value > 12:
-			month_value = current_month
-
 		periodo = (periodo or 'dia').lower()
 		if periodo not in {'dia', 'semana', 'mes'}:
 			periodo = 'dia'
@@ -122,7 +119,19 @@ class ReportesService:
 
 		ventas_mes = pedidos_mes.aggregate(total=Coalesce(Sum('total_pedido'), Decimal('0.00')))['total']
 		pedidos_dia = pedidos_hoy.count()
-		pedidos_pendientes = Pedido.objects.filter(estado__nombre__icontains='pendiente').count()
+		pedidos_por_estado_qs = (
+			pedidos_mes
+			.values('estado__nombre')
+			.annotate(total=Count('id'))
+			.order_by('estado__nombre')
+		)
+		pedidos_por_estado = [
+			{
+				'estado': item['estado__nombre'] or 'sin estado',
+				'total': item['total'],
+			}
+			for item in pedidos_por_estado_qs
+		]
 
 		valor_detalle = ReportesService._detalle_valor_expression()
 		marcas_qs = (
@@ -195,7 +204,7 @@ class ReportesService:
 			'resumen': {
 				'ventas_mes': ReportesService._decimal_to_float(ventas_mes),
 				'pedidos_dia': pedidos_dia,
-				'pedidos_pendientes': pedidos_pendientes,
+				'pedidos_por_estado': pedidos_por_estado,
 				'anio': year_value,
 				'mes': month_value,
 			},
