@@ -28,8 +28,18 @@ const LoginForm = ({ onSwitchToRegister }) => {
     try {
       const response = await authService.login(formData);
       console.log('Login exitoso:', response);
-      // Redirigir a la tienda
-      navigate('/tienda');
+      
+      // Obtener info del usuario para saber a dónde redirigir
+      const user = await authService.getMe();
+      const isAdmin = user.is_staff || 
+                      user.is_superuser || 
+                      user.rol?.nombre?.toLowerCase() === 'administrador';
+      
+      if (isAdmin) {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/tienda');
+      }
     } catch (err) {
       const message =
         err.response?.data?.detail ||

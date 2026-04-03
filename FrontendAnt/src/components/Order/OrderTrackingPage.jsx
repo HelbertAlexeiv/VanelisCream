@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
 import orderService from '../../services/orderService';
+import productService from '../../services/productService';
 import './OrderTrackingPage.css';
 
 const ORDER_STEPS = ["Recibido", "Preparando", "En camino", "Entregado", "Cancelado"];
@@ -16,9 +17,18 @@ const OrderTrackingPage = () => {
   const [loading, setLoading] = useState(true);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   
-  // Timer state (5 minutes = 300 seconds)
-  const [timeLeft, setTimeLeft] = useState(300);
+  // Dynamic timer state
+  const [timeLeft, setTimeLeft] = useState(null);
   const [isCancelled, setIsCancelled] = useState(false);
+
+  // Helper to calculate time from cancellation limit
+  const calculateTimeRemaining = (limitStr) => {
+    if (!limitStr) return null;
+    const limit = new Date(limitStr);
+    const now = new Date();
+    const diff = Math.floor((limit.getTime() - now.getTime()) / 1000);
+    return Math.max(0, diff);
+  };
 
   // Load Initial Order
   useEffect(() => {
@@ -26,19 +36,58 @@ const OrderTrackingPage = () => {
       window.scrollTo(0, 0);
       try {
         let data;
-        if (location.state && location.state.orderDetails) {
-          data = location.state.orderDetails;
-        } else {
-          data = await orderService.getOrderById(id);
+        let effectiveId = id;
+        
+        // Handle "undefined" ID from malformed navigation
+        if (!effectiveId || effectiveId === 'undefined') {
+          if (location.state?.orderDetails?.id) {
+            effectiveId = location.state.orderDetails.id;
+          } else {
+            // If still no ID, we can't fetch. Error state.
+            setLoading(false);
+            return;
+          }
         }
+
+        data = await orderService.getOrderById(effectiveId);
+        const orderData = data;
         
-        setOrder(data);
+        // HYDRATION: Fetch full product details for each item
+        const itemsToHydrate = orderData.detalles || orderData.items || [];
+        const hydratedItems = await Promise.all(
+          itemsToHydrate.map(async (item) => {
+            try {
+              const pId = item.producto_id || item.producto;
+              if (!pId) return item;
+              const pData = await productService.getProductById(pId);
+              return {
+                ...item,
+                producto_nombre: pData.nombre,
+                producto_imagen: pData.imagen,
+                producto_marca: pData.marca?.nombre,
+                // Fallback for names if already present or cache
+                nombre: pData.nombre
+              };
+            } catch (e) {
+              console.warn("Could not hydrate item:", item.producto);
+              return item;
+            }
+          })
+        );
         
-        // Find index of current status
-        const stepIdx = ORDER_STEPS.indexOf(data.status);
+        const finalOrder = { ...orderData, items: hydratedItems };
+        setOrder(finalOrder);
+        
+        // Calculate dynamic time from backend limit
+        const remaining = calculateTimeRemaining(finalOrder.fecha_limite_cancelacion);
+        if (remaining !== null) setTimeLeft(remaining);
+        
+        // Find index of current status (case-insensitive)
+        const statusName = (finalOrder.estado?.nombre || finalOrder.status || '').toLowerCase();
+        const stepIdx = ORDER_STEPS.findIndex(s => s.toLowerCase() === statusName);
         setCurrentStepIndex(stepIdx !== -1 ? stepIdx : 0);
         
-        if (data.status === 'Cancelado') {
+        if (statusName === 'cancelado') {
           setIsCancelled(true);
         }
       } catch (error) {
@@ -48,34 +97,39 @@ const OrderTrackingPage = () => {
       }
     };
     fetchOrder();
-  }, [id]);
+  }, [id, location.state]);
 
-  // Polling simulation for order progress (RF7)
+  // Polling for real-time manual updates from backend
   useEffect(() => {
-    if (loading || isCancelled || currentStepIndex >= 3) return; // Stop if cancelled or delivered
+    const effectiveId = (id && id !== 'undefined') ? id : order?.id;
+    if (loading || isCancelled || currentStepIndex >= 3 || !effectiveId) return;
 
-    const pollInterval = setInterval(() => {
-      // En una implementación real, harías: const data = await orderService.getOrderById(id); setOrder(data);
-      // Aqui simulamos que el restaurante avanza el pedido cada 15 segundos para propósitos de demostración al cliente.
-      setCurrentStepIndex(prev => {
-        const nextStep = prev + 1;
-        if (nextStep < 4) {
-          return nextStep;
+    const pollInterval = setInterval(async () => {
+      try {
+        const data = await orderService.getOrderById(effectiveId);
+        setOrder(data);
+        
+        const statusName = (data.estado?.nombre || data.status || '').toLowerCase();
+        const stepIdx = ORDER_STEPS.findIndex(s => s.toLowerCase() === statusName);
+        setCurrentStepIndex(stepIdx !== -1 ? stepIdx : 0);
+        
+        if (statusName === 'entregado' || statusName === 'cancelado') {
+          clearInterval(pollInterval);
         }
-        clearInterval(pollInterval);
-        return prev;
-      });
-    }, 15000); // Avanza un paso cada 15 segundos simulado
+      } catch (error) {
+        console.error("Polling error:", error);
+      }
+    }, 8000); // Poll every 8 seconds for real-time responsiveness
 
     return () => clearInterval(pollInterval);
-  }, [loading, isCancelled, currentStepIndex]);
+  }, [loading, isCancelled, currentStepIndex, id, order?.id]);
 
   // Handle countdown timer 
   useEffect(() => {
-    if (timeLeft <= 0 || isCancelled || currentStepIndex >= 1) return; // Stop timer if cancelled, reaches 0, or if order is past "Recibido"
+    if (timeLeft === null || timeLeft <= 0 || isCancelled || currentStepIndex >= 1) return;
 
     const timer = setInterval(() => {
-      setTimeLeft(prev => prev - 1);
+      setTimeLeft(prev => (prev !== null && prev > 0 ? prev - 1 : 0));
     }, 1000);
 
     return () => clearInterval(timer);
@@ -145,7 +199,9 @@ const OrderTrackingPage = () => {
 
         {/* Stepper Card */}
         <section className="stepper-card card-shadow-soft">
-          <h2 className="order-number-title">Número de Pedido: <span>#ORDER-{id}</span></h2>
+          <h2 className="order-number-title">
+            Número de Pedido: <span>#ORDER-{order?.id || order?.pk || id || "Cargando..."}</span>
+          </h2>
           
           <div className="stepper-container">
             {/* Background Line */}
@@ -190,10 +246,19 @@ const OrderTrackingPage = () => {
             <h3 className="tracking-section-title">Resumen de la Orden</h3>
             
             <div className="order-items-list">
-              {order.items?.map((item, idx) => (
+              {(order.items || order.detalles)?.map((item, idx) => (
                 <div className="order-item-row" key={idx}>
-                  <span className="o-item-name">{item.nombre} x {item.cantidad}</span>
-                  <span className="o-item-price">${(item.precio * item.cantidad).toLocaleString('es-CO')}</span>
+                  <div className="o-item-img-mini">
+                    <img src={item.producto_imagen || 'https://via.placeholder.com/50x50?text=Helado'} alt={item.producto_nombre} />
+                  </div>
+                  <div className="o-item-info">
+                    <div className="o-item-header">
+                      <span className="o-item-name">{item.producto_nombre || item.nombre || `Producto #${item.producto}`}</span>
+                      <span className="o-item-qty">x{item.cantidad}</span>
+                    </div>
+                    {item.producto_marca && <span className="o-item-brand">{item.producto_marca}</span>}
+                  </div>
+                  <span className="o-item-price">${(parseFloat(item.precio_unitario || item.precio || 0) * item.cantidad).toLocaleString('es-CO')}</span>
                 </div>
               ))}
             </div>
@@ -202,11 +267,11 @@ const OrderTrackingPage = () => {
 
             <div className="order-subtotal-row">
               <span className="o-label">Subtotal:</span>
-              <span className="o-value">${order.subtotal?.toLocaleString('es-CO') || order.total?.toLocaleString('es-CO')}</span>
+              <span className="o-value">${(parseFloat(order.subtotal || order.total_pedido || order.total || 0)).toLocaleString('es-CO')}</span>
             </div>
             <div className="order-total-row">
               <span className="o-label">Total:</span>
-              <span className="o-value-total">${order.total?.toLocaleString('es-CO')}</span>
+              <span className="o-value-total">${(parseFloat(order.total_pedido || order.total || 0)).toLocaleString('es-CO')}</span>
             </div>
           </section>
 
@@ -214,13 +279,16 @@ const OrderTrackingPage = () => {
           <section className="delivery-details-card card-shadow-soft">
             <h3 className="tracking-section-title">Detalles de Entrega</h3>
             <div className="delivery-details-list">
-              <p><strong>Nombre Completo:</strong> {order.cliente_info?.nombre}</p>
-              <p><strong>Dirección de Envío:</strong> {order.cliente_info?.direccion}</p>
-              <p><strong>Ciudad:</strong> {order.cliente_info?.ciudad}</p>
-              <p><strong>Teléfono:</strong> {order.cliente_info?.telefono}</p>
-              {order.cliente_info?.instrucciones && (
-                <p><strong>Instrucciones:</strong> {order.cliente_info.instrucciones}</p>
+              {order.direccion_entrega ? (
+                <p><strong>Dirección de Envío:</strong> {order.direccion_entrega}</p>
+              ) : (
+                <>
+                  <p><strong>Nombre Completo:</strong> {order.cliente_info?.nombre}</p>
+                  <p><strong>Dirección de Envío:</strong> {order.cliente_info?.direccion}</p>
+                  <p><strong>Ciudad:</strong> {order.cliente_info?.ciudad}</p>
+                </>
               )}
+              {order.cliente_info?.telefono && <p><strong>Teléfono:</strong> {order.cliente_info?.telefono}</p>}
             </div>
           </section>
         </div>
@@ -247,7 +315,7 @@ const OrderTrackingPage = () => {
 
           <div className="navigation-group">
             <button className="nav-btn primary" onClick={() => navigate('/tienda')}>Volver al Inicio</button>
-            <button className="nav-btn text" onClick={() => {/* Iría a historial de compras */}}>Ver mis Pedidos</button>
+            <button className="nav-btn text" onClick={() => navigate('/mis-pedidos')}>Ver mis Pedidos</button>
           </div>
         </div>
 

@@ -14,9 +14,11 @@ const ProductCard = ({ producto }) => {
     <div className="product-card">
       <div className="product-image-container">
         {/* Etiqueta de marca flotante */}
-        {producto.marca?.nombre && (
+        {(producto.marca?.nombre || typeof producto.marca === 'string') && (
           <div className="brand-badge">
-            <span className="brand-text">{producto.marca.nombre}</span>
+            <span className="brand-text">
+              {typeof producto.marca === 'object' ? producto.marca.nombre : producto.marca}
+            </span>
           </div>
         )}
         

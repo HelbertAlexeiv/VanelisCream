@@ -4,6 +4,7 @@ import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
 import { useCart } from '../../context/CartContext';
 import orderService from '../../services/orderService';
+import authService from '../../services/authService';
 import './CartPage.css';
 
 const CartPage = () => {
@@ -22,9 +23,26 @@ const CartPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Scroll to top on load
+  // Scroll to top and Load User Profile
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    const loadProfile = async () => {
+      if (authService.isAuthenticated()) {
+        try {
+          const user = await authService.getMe();
+          setDeliveryData(prev => ({
+            ...prev,
+            nombre: `${user.first_name || ''} ${user.last_name || ''}`.trim() || user.username,
+            direccion: user.direccion || '',
+            telefono: user.telefono || ''
+          }));
+        } catch (error) {
+          console.error("Error loading user profile:", error);
+        }
+      }
+    };
+    loadProfile();
   }, []);
 
   // Handle Search interaction from Header: redirect back to Catalog
@@ -56,41 +74,60 @@ const CartPage = () => {
 
     setIsSubmitting(true);
     
-    // Construct payload per RF5 specs
+    // Combine fields into a single address string for the backend as Pedido model requires
+    const fullAddress = `${deliveryData.direccion}, ${deliveryData.barrio ? deliveryData.barrio + ', ' : ''}${deliveryData.ciudad}${deliveryData.instrucciones ? ' (Instrucciones: ' + deliveryData.instrucciones + ')' : ''}`;
+
+    // Construct payload per latest backend findings (PedidoCreateSerializer)
     const payload = {
-      cliente_info: {
-        nombre: deliveryData.nombre,
-        direccion: deliveryData.direccion,
-        ciudad: deliveryData.ciudad,
-        barrio: deliveryData.barrio,
-        telefono: deliveryData.telefono,
-        instrucciones: deliveryData.instrucciones
-      },
-      items: cartItems.map(item => ({
-        producto_id: item.id,
-        cantidad: item.quantity
-      })),
-      total: cartTotal
+      direccion_entrega: fullAddress,
+      total_pedido: cartTotal,
+      detalles: cartItems.map(item => ({
+        producto: item.id,
+        cantidad: item.quantity,
+        precio_unitario: item.precio,
+        subtotal: item.precio * item.quantity
+      }))
     };
 
     try {
       const response = await orderService.createOrder(payload);
       console.log('Pedido exitoso:', response);
       
+      let orderId = response.id;
+      
+      // FALLBACK: If the response is missing the ID, fetch the user's latest order
+      if (!orderId) {
+        console.warn("Backend didn't return an order ID. Attempting recovery...");
+        try {
+          const myOrders = await orderService.getUserOrders({ page_size: 1 });
+          const latest = Array.isArray(myOrders) ? myOrders[0] : (myOrders.results ? myOrders.results[0] : null);
+          if (latest) {
+            orderId = latest.id;
+            console.log("Success: Recovered ID", orderId);
+          }
+        } catch (e) {
+          console.error("Failed to recover order ID:", e);
+        }
+      }
+
       const orderDetails = {
-        id: response.id,
+        id: orderId,
         status: "Recibido",
-        cliente_info: payload.cliente_info,
-        items: cartItems,
-        subtotal: cartSubtotal,
+        direccion_entrega: payload.direccion_entrega,
+        items: cartItems.map(item => ({
+             ...item,
+             cantidad: item.quantity,
+             producto_nombre: item.nombre
+        })),
         total: cartTotal
       };
       
       clearCart();
-      // Redirect to the new Order Tracking View using the ID generated and passing state
-      navigate(`/pedido/${response.id}`, { state: { orderDetails } });
+      navigate(`/pedido/${orderId || 'error'}`, { state: { orderDetails } });
     } catch (error) {
-      alert("Hubo un error al procesar el pedido. Inténtalo de nuevo.");
+      console.error('Error al crear pedido:', error);
+      const errorMsg = error.response?.data?.detalle || "Hubo un error al procesar el pedido. Inténtalo de nuevo.";
+      alert(errorMsg);
     } finally {
       setIsSubmitting(false);
     }

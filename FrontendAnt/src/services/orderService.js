@@ -1,23 +1,16 @@
 import api from './api';
 
-/**
- * Servicio de Pedidos (RF5) para Vanelis Cream
- */
 const orderService = {
   /**
+   * Servicio de Pedidos (RF5) para Vanelis Cream
+   */
+  /**
    * Crear un nuevo pedido
-   * POST /api/pedidos/pedidos
-   * 
-   * @param {Object} orderData Payload con info del cliente e items
-   * Expected format:
-   * { 
-   *   "cliente_info": { "nombre": "...", "direccion": "...", "ciudad": "...", "barrio": "...", "telefono": "..." }, 
-   *   "items": [ { "producto_id": 89, "cantidad": 1 } ], 
-   *   "total": 50000 
-   * }
+   * POST /api/pedidos/
    */
   createOrder: async (orderData) => {
-    const response = await api.post('/api/pedidos/pedidos', orderData);
+    // Expected format: { direccion_entrega, total_pedido, detalles: [...] }
+    const response = await api.post('/api/pedidos/', orderData);
     return response.data;
   },
 
@@ -26,7 +19,7 @@ const orderService = {
    * GET /api/pedidos/pedidos/:id
    */
   getOrderById: async (id) => {
-    const response = await api.get(`/api/pedidos/pedidos/${id}`);
+    const response = await api.get(`/api/pedidos/${id}/`);
     return response.data;
   },
 
@@ -35,7 +28,16 @@ const orderService = {
    * POST /api/pedidos/pedidos/:id/cancelar
    */
   cancelOrder: async (id) => {
-    const response = await api.post(`/api/pedidos/pedidos/${id}/cancelar`);
+    const response = await api.post(`/api/pedidos/${id}/cancelar/`);
+    return response.data;
+  },
+
+  /**
+   * Obtener pedidos del usuario autenticado
+   * GET /api/pedidos/
+   */
+  getUserOrders: async (params = {}) => {
+    const response = await api.get('/api/pedidos/', { params: { ...params, ordering: '-id' } });
     return response.data;
   }
 };

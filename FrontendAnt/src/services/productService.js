@@ -30,7 +30,7 @@ const productService = {
       }
     });
 
-    const response = await api.get('/api/catalogo/productos', {
+    const response = await api.get('/api/catalogo/productos/', {
       params: cleanParams,
     });
     return response.data;
@@ -41,7 +41,7 @@ const productService = {
    * GET /api/catalogo/productos/:id
    */
   getProductById: async (id) => {
-    const response = await api.get(`/api/catalogo/productos/${id}`);
+    const response = await api.get(`/api/catalogo/productos/${id}/`);
     return response.data;
   },
 };

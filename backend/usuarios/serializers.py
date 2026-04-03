@@ -18,6 +18,8 @@ class UsuarioRespuestaSerializer(serializers.ModelSerializer):
             "telefono",
             "direccion",
             "rol",
+            "is_staff",
+            "is_superuser",
         ]
 
     def get_rol(self, obj):

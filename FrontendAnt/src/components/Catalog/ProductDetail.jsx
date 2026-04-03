@@ -125,10 +125,11 @@ const ProductDetail = () => {
               <div className="brand-and-stock">
                 <div className="brand-info">
                   <div className="brand-logo-placeholder">
-                    {/* Simulated logo for Crem Helado or brand name */}
-                    <span className="simulated-logo">{product.marca?.nombre}</span>
+                    {/* Handle both object {nombre} and direct string from API */}
+                    <span className="simulated-logo">
+                      {typeof product.marca === 'object' ? product.marca?.nombre : (product.marca || 'V')}
+                    </span>
                   </div>
-                  <span className="brand-label">Marca: <span className="brand-name">{product.marca?.nombre}</span></span>
                 </div>
                 {product.stock > 0 && (
                   <p className="stock-info">Stock disponible: {product.stock} unidades</p>
@@ -173,7 +174,9 @@ const ProductDetail = () => {
           {/* Bottom Section: Related Products */}
           {!loadingRelated && relatedProducts.length > 0 && (
             <div className="related-products-section">
-              <h3 className="related-title">Productos Relacionados de {product.marca?.nombre}</h3>
+              <h3 className="related-title">
+                Productos Relacionados de {typeof product.marca === 'object' ? product.marca?.nombre : (product.marca || 'Vanelis')}
+              </h3>
               
               <div className="related-grid">
                 {relatedProducts.map((relProduct) => (
@@ -186,7 +189,9 @@ const ProductDetail = () => {
                       />
                     </div>
                     <div className="related-info">
-                       <span className="related-brand-tag">{relProduct.marca?.nombre}</span>
+                       <span className="related-brand-tag">
+                        {typeof relProduct.marca === 'object' ? relProduct.marca?.nombre : (relProduct.marca || 'V')}
+                       </span>
                        <span className="related-name">{relProduct.nombre}</span>
                     </div>
                   </div>

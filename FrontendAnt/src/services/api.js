@@ -14,10 +14,44 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
     if (token) {
-      // DRF Token Auth uses "Token <token>" prefix
       config.headers.Authorization = `Token ${token}`;
     }
     return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+// Función recursiva para corregir errores de encoding (ej: Ã³ -> ó)
+const fixEncoding = (obj) => {
+  if (obj === null || obj === undefined) return obj;
+  if (typeof obj === 'string') {
+    try {
+      // Intenta corregir strings que fueron mal interpretados como ISO-8859-1
+      return decodeURIComponent(escape(obj));
+    } catch (e) {
+      return obj;
+    }
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(fixEncoding);
+  }
+  if (typeof obj === 'object') {
+    const fixedObj = {};
+    for (const key in obj) {
+      fixedObj[key] = fixEncoding(obj[key]);
+    }
+    return fixedObj;
+  }
+  return obj;
+};
+
+// Interceptor para limpiar caracteres extraños en la respuesta
+api.interceptors.response.use(
+  (response) => {
+    if (response.data) {
+      response.data = fixEncoding(response.data);
+    }
+    return response;
   },
   (error) => Promise.reject(error)
 );
