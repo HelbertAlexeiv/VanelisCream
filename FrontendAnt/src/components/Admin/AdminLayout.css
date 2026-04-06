@@ -1,0 +1,239 @@
+.admin-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f1ec; /* Warm cream background from mockup */
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+  font-family: 'Inter', sans-serif;
+  color: #333;
+}
+
+.admin-header {
+  background: linear-gradient(180deg, #D32F2F 0%, #C62828 100%);
+  color: white;
+  padding: 1.5rem 0 0.5rem 0; /* Reduced top padding, unified row */
+  position: relative;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.admin-header-row {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 2rem;
+}
+
+.admin-logo {
+  height: 60px;
+  transition: transform 0.3s ease;
+}
+
+.admin-logo:hover {
+  transform: scale(1.05);
+}
+
+.admin-user-actions {
+  position: relative;
+}
+
+.admin-profile-icon {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.admin-profile-icon:hover, .admin-profile-icon.active {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.1);
+}
+
+/* Admin Dropdown Menu */
+.admin-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 15px);
+  right: 0;
+  width: 220px;
+  background: white;
+  border-radius: 16px;
+  padding: 1rem 0;
+  z-index: 1000;
+  animation: slideIn 0.3s ease-out;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-user-info {
+  padding: 0 1.5rem 0.8rem;
+}
+
+.d-name {
+  margin: 0;
+  font-weight: 700;
+  color: #333;
+  font-size: 1rem;
+}
+
+.d-role {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #D32F2F;
+  font-weight: 600;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #eee;
+  margin: 0.5rem 0;
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 1.5rem;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background: #fdfaf8;
+  color: #D32F2F;
+}
+
+.logout-item {
+  color: #D32F2F;
+  font-weight: 600;
+}
+
+/* Administrative Tabs Navigation */
+.admin-nav-tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 6px;
+  border-radius: 12px;
+  backdrop-filter: blur(5px);
+}
+
+.tab-btn {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 10px 20px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tab-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn.active-tab {
+  background: #9b1e1e; /* Darker red from mockup */
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.tab-separator {
+  color: rgba(255, 255, 255, 0.4);
+  margin: 0 10px;
+  font-weight: 300;
+}
+
+/* Curve at the bottom of header */
+.header-curve-divider {
+  line-height: 0;
+  margin-top: -1px;
+}
+
+.header-curve-divider svg {
+  width: 100%;
+  height: 30px;
+}
+
+/* Main Content Wrapper */
+.admin-content {
+  flex: 1;
+  max-width: 1250px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+/* Footer Section */
+.admin-footer {
+  margin-top: auto;
+  background: white;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e0d0c5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  color: #7d6e65;
+  font-size: 0.9rem;
+}
+
+.footer-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-info span {
+  font-weight: 700;
+  color: #D32F2F;
+}
+
+.social-icons {
+  display: flex;
+  gap: 0.8rem;
+  color: #D32F2F;
+}
+
+.footer-copyright a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .admin-header-main {
+    padding: 0 1rem;
+  }
+  
+  .admin-nav-tabs {
+    margin: 1rem 1rem 0;
+    max-width: none;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  .tab-btn {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+  }
+}
