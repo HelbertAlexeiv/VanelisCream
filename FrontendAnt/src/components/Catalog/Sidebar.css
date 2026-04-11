@@ -1,0 +1,235 @@
+.catalog-sidebar {
+  width: 260px;
+  background: #FFF8F0;
+  border-right: 1px solid #F0DDD0;
+  padding: 24px 0;
+  flex-shrink: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mobile-filter-btn {
+  display: none;
+}
+
+.sidebar-title {
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #B71C1C;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+.filter-group {
+  border-bottom: 1px solid #F0DDD0;
+  padding: 16px 24px;
+}
+
+.filter-group:last-child {
+  border-bottom: none;
+}
+
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+.filter-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 10px;
+}
+
+/* Checkbox Styles */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 28px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #555;
+  user-select: none;
+}
+
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 18px;
+  width: 18px;
+  background-color: transparent;
+  border: 1.5px solid #E0D5CA;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.checkbox-container:hover input ~ .checkmark {
+  border-color: #D32F2F;
+}
+
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #D32F2F;
+  border-color: #D32F2F;
+}
+
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+.checkbox-container .checkmark:after {
+  left: 6px;
+  top: 2px;
+  width: 4px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.price-range-filter {
+  padding-left: 0;
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.price-input {
+  flex: 1;
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #E0D5CA;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.price-input:focus {
+  outline: none;
+  border-color: #D32F2F;
+}
+
+.price-separator {
+  color: #666;
+  font-weight: bold;
+}
+
+/* Presentation Buttons */
+.presentation-options {
+  padding-left: 0;
+  gap: 8px;
+}
+
+.presentation-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #555;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.presentation-btn:hover {
+  background: rgba(211,47,47,0.05);
+  color: #D32F2F;
+}
+
+/* Clear Filters Button */
+.clear-all-filters-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px;
+  background: #FFF0F0;
+  border: 1px solid #FFCDD2;
+  color: #D32F2F;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-all-filters-btn:hover {
+  background: #D32F2F;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .catalog-sidebar {
+    position: fixed;
+    top: 0;
+    left: -280px;
+    height: 100vh;
+    z-index: 200;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    background: #FFF;
+    overflow-y: auto;
+  }
+
+  .catalog-sidebar.open {
+    left: 0;
+  }
+
+  .mobile-filter-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #e0d5ca;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    font-family: inherit;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  }
+}

@@ -44,7 +44,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
     # permission_classes = [IsAuthenticated]
 
 class ProductoViewSet(viewsets.ModelViewSet):
-    queryset = Producto.objects.select_related('marca', 'presentacion')
+    queryset = Producto.objects.select_related('marca', 'presentacion').filter(stock__gt=0).order_by('nombre')
     serializer_class = ProductoSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ProductoFilter
@@ -66,7 +66,7 @@ class ProductoViewSet(viewsets.ModelViewSet):
         except ValueError:
             umbral = 10
             
-        productos_bajo_stock = Producto.objects.select_related('marca', 'presentacion').filter(stock__lte=umbral)
+        productos_bajo_stock = Producto.objects.select_related('marca', 'presentacion').filter(stock__lte=umbral).order_by('nombre')
         serializer = self.get_serializer(productos_bajo_stock, many=True)
         return Response({
             "descripcion": f"Productos con stock menor o igual a {umbral}",
