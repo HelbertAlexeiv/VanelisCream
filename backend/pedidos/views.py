@@ -191,7 +191,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
         with transaction.atomic():
             pedido.estado = estado_recibido
-            pedido.save(update_fields=['estado'])
+            pedido.empleado = request.user
+            pedido.save(update_fields=['estado', 'empleado'])
 
             if request.user.is_staff and estado_anterior.id != estado_recibido.id:
                 self._registrar_auditoria_estado(
@@ -260,7 +261,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
         # Reintegrar el stock antes de cambiar el estado del pedido
         with transaction.atomic():
             pedido.estado = estado_cancelado
-            pedido.save(update_fields=['estado'])
+            pedido.empleado = request.user
+            pedido.save(update_fields=['estado', 'empleado'])
 
             if request.user.is_staff and estado_anterior.id != estado_cancelado.id:
                 self._registrar_auditoria_estado(
