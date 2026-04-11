@@ -34,6 +34,7 @@ class UsuarioRespuestaSerializer(serializers.ModelSerializer):
 class RegistroUsuarioSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
+    # Se mantiene para compatibilidad con clientes actuales, pero se ignora al crear.
     rol = serializers.PrimaryKeyRelatedField(
         queryset=Rol.objects.all(), required=False, allow_null=True
     )
@@ -63,8 +64,14 @@ class RegistroUsuarioSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password2")
+        validated_data.pop("rol", None)
         password = validated_data.pop("password")
-        usuario = Usuario(**validated_data)
+
+        rol_cliente = Rol.objects.filter(nombre__iexact="cliente").first()
+        if rol_cliente is None:
+            rol_cliente = Rol.objects.create(nombre="Cliente")
+
+        usuario = Usuario(**validated_data, rol=rol_cliente)
         usuario.set_password(password)
         usuario.save()
         return usuario
