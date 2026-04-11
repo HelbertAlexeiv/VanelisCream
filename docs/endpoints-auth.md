@@ -20,14 +20,13 @@ Body de entrada:
   "first_name": "Carla",
   "last_name": "Mora",
   "telefono": "3001234567",
-  "direccion": "Calle 1",
-  "rol": 1
+  "direccion": "Calle 1"
 }
 ```
 
 Notas:
 
-- rol es opcional.
+- El sistema asigna automaticamente el rol Cliente al usuario nuevo.
 - password y password2 deben coincidir.
 - password pasa por validacion de contrasena de Django.
 
