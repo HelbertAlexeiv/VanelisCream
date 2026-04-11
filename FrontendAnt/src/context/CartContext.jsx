@@ -15,9 +15,12 @@ const cartReducer = (state, action) => {
     case 'ADD_ITEM':
       const existingItemIndex = state.items.findIndex(item => item.id === action.payload.id);
       if (existingItemIndex > -1) {
-        // Item exists, just update quantity
+        // Item exists: update quantity immutably
         newItems = [...state.items];
-        newItems[existingItemIndex].quantity += action.payload.quantity;
+        newItems[existingItemIndex] = {
+          ...newItems[existingItemIndex],
+          quantity: newItems[existingItemIndex].quantity + action.payload.quantity,
+        };
       } else {
         // New item
         newItems = [...state.items, action.payload];
