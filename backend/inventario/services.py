@@ -5,8 +5,9 @@ from django.utils import timezone
 
 from catalogo.models import Producto
 
-
+# Servicio para gestionar el inventario en función de los pedidos y su estado
 class InventarioService:
+    # Métodos estáticos para determinar si se debe descontar o reintegrar stock según el estado del pedido
 	@staticmethod
 	def stock_descontado(pedido):
 		return pedido.estado.nombre.lower() == 'recibido'
@@ -14,11 +15,11 @@ class InventarioService:
 	@staticmethod
 	def stock_reintegrado(pedido):
 		return pedido.estado.nombre.lower() == 'cancelado'
-
+	# Método privado para obtener las cantidades totales por producto en un pedido, manejando casos de error
 	@staticmethod
 	def _obtener_cantidades_por_producto(pedido):
 		cantidades_por_producto = defaultdict(int)
-
+		# Validar que cada detalle del pedido tenga un producto asociado
 		for detalle in pedido.detalles.all():
 			if detalle.producto_id is None:
 				return None, 'El detalle del pedido no tiene producto asociado.'
@@ -26,7 +27,8 @@ class InventarioService:
 			cantidades_por_producto[detalle.producto_id] += detalle.cantidad or 0
 
 		return cantidades_por_producto, None
-
+	# Método para descontar stock de un pedido, asegurando 
+ 	# que el pedido esté en el estado correcto y que haya suficiente stock disponible
 	@staticmethod
 	def descontar_stock_pedido(pedido_id, usuario='sistema'):
 		from pedidos.models import Pedido
@@ -50,7 +52,7 @@ class InventarioService:
 				return False, error
 
 			productos = Producto.objects.select_for_update().filter(id__in=cantidades_por_producto.keys()).in_bulk()
-
+			# Validar que cada producto exista y que haya suficiente stock para descontar
 			for producto_id, cantidad_total in cantidades_por_producto.items():
 				producto = productos.get(producto_id)
 				if producto is None:
@@ -58,7 +60,7 @@ class InventarioService:
 
 				if producto.stock < cantidad_total:
 					return False, f'Stock insuficiente para el producto {producto.nombre}.'
-
+			# Descontar el stock de cada producto según la cantidad total requerida por el pedido
 			for producto_id, cantidad_total in cantidades_por_producto.items():
 				producto = productos[producto_id]
 				producto.stock -= cantidad_total
@@ -66,6 +68,8 @@ class InventarioService:
 
 			return True, 'Stock descontado exitosamente.'
 
+	# Método para reintegrar stock de un pedido, asegurando 
+	# que el pedido esté en el estado correcto y que los productos existan
 	@staticmethod
 	def reintegrar_stock_pedido(pedido_id, usuario='sistema'):
 		from pedidos.models import Pedido
@@ -102,6 +106,8 @@ class InventarioService:
 
 			return True, 'Stock reintegrado exitosamente.'
 
+	# Método para procesar pedidos vencidos, buscando aquellos que han superado
+ 	# su fecha límite de cancelación y están en estado "recibido", y descontando su stock automáticamente
 	@staticmethod
 	def procesar_pedidos_vencidos():
 		from pedidos.models import Pedido

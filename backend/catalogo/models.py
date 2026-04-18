@@ -1,18 +1,27 @@
 from django.db import models
 
-# Create your models here.
+
+# Estos modelos representan las tablas de la base de datos que almacenarán la información 
+
+
+#Creamos los modelos para la aplicación "catalogo"
 class Marca(models.Model):
 
     nombre = models.CharField(max_length=100, unique=True)
 
+    #Definimos la clase Meta para configurar el nombre de la tabla y los nombres en singular y plural para el modelo Marca
     class Meta:
         db_table = "marca"
         verbose_name = "Marca"
         verbose_name_plural = "Marcas"
-
+    #Definimos el método __str__ para que al mostrar un objeto Marca en el admin de Django, 
+    # se muestre su nombre en lugar de su representación por defecto (que sería algo como "Marca object (1)")
     def __str__(self):
         return self.nombre
     
+
+#Creamos el modelo para las presentaciones de los productos
+
 class Presentacion(models.Model):
 
     nombre = models.CharField(max_length=100, unique=True)
@@ -26,6 +35,7 @@ class Presentacion(models.Model):
     def __str__(self):
         return self.nombre
 
+#Creamos el modelo para los productos, que tendrá una relación con las marcas y presentaciones
 class Producto(models.Model):
 
     nombre = models.CharField(max_length=100, unique=True)

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import environ
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +29,10 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool('DEBUG', default=False)
 
-# ALLOWED_HOSTS configurable desde entorno para Render
+# ALLOWED_HOSTS sirve para especificar los dominios que pueden acceder a la aplicación. 
+# En Render, se debe configurar esta variable con el dominio del servicio.
+# En desarrollo local, se permiten localhost 
+
 ALLOWED_HOSTS_ENV = env('ALLOWED_HOSTS', default='')
 ALLOWED_HOSTS = [host.strip() for host in ALLOWED_HOSTS_ENV.split(',') if host.strip()]
 if DEBUG and not ALLOWED_HOSTS:
@@ -54,7 +58,8 @@ INSTALLED_APPS = [
     'reportes',
     'corsheaders',
 ]
-
+# Middleware es una lista de componentes que se ejecutan en cada solicitud y respuesta.
+#Sirve para agregar funcionalidades como seguridad, manejo de sesiones, autenticación, etc.
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
@@ -67,6 +72,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'backend.urls'
+
 
 TEMPLATES = [
     {
@@ -88,9 +94,11 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-# Render proporciona DATABASE_URL automáticamente, sino usa variables individuales
 
-import dj_database_url
+
+
+# En este caso son variables de entorno para configurar la base de datos,
+# lo que permite flexibilidad entre entornos de desarrollo y producción.
 
 if env('DATABASE_URL', default=''):
     DATABASES = {
@@ -122,6 +130,7 @@ else:
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
+#
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -171,7 +180,9 @@ if DEBUG:
     INTERNAL_IPS = ['127.0.0.1', 'localhost']
 
 # CORS Configuration
-# En Render: Actualizar variable CORS_ALLOWED_ORIGINS con dominio del frontend
+#En producción, se deben configurar las variables de entorno 
+# CORS_ALLOWED_ORIGINS y CSRF_TRUSTED_ORIGINS con los dominios permitidos.
+#Esto es para que el frontend pueda comunicarse con el backend sin problemas de seguridad relacionados con CORS y CSRF.
 CORS_ORIGINS = env('CORS_ALLOWED_ORIGINS', default='')
 if CORS_ORIGINS:
     CORS_ALLOWED_ORIGINS = [origin.strip() for origin in CORS_ORIGINS.split(',')]

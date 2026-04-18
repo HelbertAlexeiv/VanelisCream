@@ -11,10 +11,16 @@ from .serializers import MarcaSerializer, PresentacionSerializer, ProductoSerial
 from django.db.models import Q
 
 
+# Las vistas son las encargadas de manejar las solicitudes HTTP y devolver las respuestas adecuadas.
+# En este caso, estamos utilizando viewsets de Django REST Framework
+# para crear vistas que manejann las operaciones CRUD (Create, Read, Update, Delete) para cada uno de los modelos.
+
+
 class ProductoPagination(PageNumberPagination):
+    # Configuramos la paginación para los productos, estableciendo un tamaño de página predeterminado de 10
     page_size = 10
     page_size_query_param = 'page_size'
-    max_page_size = 100
+    max_page_size = 100 
 
 
 #filtros para productos
@@ -32,10 +38,11 @@ class ProductoFilter(filters.FilterSet):
             Q(nombre__icontains=value) |
             Q(descripcion__icontains=value))
 
-#falta PAG
+
+#Aqui maneja el CRUD 
 class MarcaViewSet(viewsets.ModelViewSet):
-    queryset = Marca.objects.all()
-    serializer_class = MarcaSerializer
+    queryset = Marca.objects.all() #Queryn para hacer el CRUD, esto gracias a que es un ModelViewSet
+    serializer_class = MarcaSerializer #Convierte los objetos Marca a formatos como JSON para enviarlos a través de la API.
     # permission_classes = [IsAuthenticated]
 
 class PresentacionViewSet(viewsets.ModelViewSet):
@@ -46,7 +53,7 @@ class PresentacionViewSet(viewsets.ModelViewSet):
 class ProductoViewSet(viewsets.ModelViewSet):
     queryset = Producto.objects.select_related('marca', 'presentacion').filter(stock__gt=0).order_by('nombre')
     serializer_class = ProductoSerializer
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = [DjangoFilterBackend] 
     filterset_class = ProductoFilter
     pagination_class = ProductoPagination
     # permission_classes = [IsAuthenticated]
@@ -59,6 +66,8 @@ class ProductoViewSet(viewsets.ModelViewSet):
         url_path='stock_bajo',
         url_name='stock-bajo',
     )
+    # Este método maneja una solicitud GET a la URL /api/catalogo/productos/stock_bajo/ 
+    # y devuelve una lista de productos cuyo stock es menor o igual a un umbral especificado (por defecto 15).
     def stock_bajo(self, request):
         umbral = request.query_params.get('umbral', 15)
         try:
