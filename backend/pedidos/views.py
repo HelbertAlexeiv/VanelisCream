@@ -62,6 +62,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
 
     @staticmethod
     def _registrar_auditoria_estado(*, pedido, usuario, estado_anterior, estado_nuevo):
+        # Se centraliza el registro de auditoria para reutilizar el mismo formato
+        # en todos los cambios de estado del pedido.
         AuditoriaPedido.objects.create(
             pedido=pedido,
             usuario=usuario.username,
@@ -102,6 +104,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK,
             )
 
+        # Estado, empleado y auditoria se guardan en una sola transaccion para
+        # evitar inconsistencias si alguna operacion falla.
         with transaction.atomic():
             pedido.estado = estado_nuevo
             pedido.empleado = request.user
@@ -133,6 +137,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
         campos_permitidos = {'fecha_evento', 'usuario', 'accion', 'pedido_id', 'id'}
         campos_ordenamiento = []
 
+        # Se valida cada campo recibido para evitar ordenamientos por columnas no permitidas.
         for campo in ordering_param.split(','):
             campo = campo.strip()
             if not campo:
@@ -141,6 +146,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
             if campo_limpio in campos_permitidos:
                 campos_ordenamiento.append(campo)
 
+        # Se fuerza un desempate por id para mantener resultados estables entre paginas.
         if not campos_ordenamiento:
             campos_ordenamiento = ['-fecha_evento', '-id']
         elif not any(campo.lstrip('-') == 'id' for campo in campos_ordenamiento):
@@ -189,6 +195,7 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
+        # El cambio de estado, auditoria y descuento de stock se manejan de forma atomica.
         with transaction.atomic():
             pedido.estado = estado_recibido
             pedido.empleado = request.user
@@ -258,7 +265,8 @@ class PedidoViewSet(viewsets.ModelViewSet):
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
-        # Reintegrar el stock antes de cambiar el estado del pedido
+
+        # El rollback protege estado/auditoria si falla la reintegracion de stock.
         with transaction.atomic():
             pedido.estado = estado_cancelado
             pedido.empleado = request.user

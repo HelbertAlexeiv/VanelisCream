@@ -84,6 +84,7 @@ class PedidoAuditoriaTests(APITestCase):
 		self.assertEqual(response.data['results'][0]['pedido_id'], self.pedido.id)
 
 	def test_admin_puede_ordenar_auditoria_por_usuario(self):
+		# Se crean usuarios en orden inverso para comprobar que ordering=usuario se respeta.
 		AuditoriaPedido.objects.create(
 			pedido=self.pedido,
 			usuario='zeta_user',
