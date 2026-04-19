@@ -16,6 +16,7 @@ class DashboardReporteAPIView(APIView):
 				status=status.HTTP_403_FORBIDDEN,
 			)
 
+		# Se valida temprano para devolver errores consistentes antes de consultar BD.
 		periodo = request.query_params.get('periodo', 'dia')
 		if periodo not in {'dia', 'semana', 'mes'}:
 			return Response(
@@ -39,6 +40,7 @@ class DashboardReporteAPIView(APIView):
 					status=status.HTTP_400_BAD_REQUEST,
 				)
 
+		# Se restringe anio al rango soportado por datetime para prevenir errores.
 		anio = request.query_params.get('anio')
 		if anio not in (None, ''):
 			try:

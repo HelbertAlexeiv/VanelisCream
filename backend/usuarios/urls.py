@@ -10,6 +10,7 @@ urlpatterns = [
     path("registro/", RegistroUsuarioAPIView.as_view(), name="registro"),
     path(
         "login/",
+        # Login estandar DRF: recibe credenciales y responde con token.
         ObtainAuthToken.as_view(authentication_classes=[], permission_classes=[AllowAny]),
         name="login",
     ),

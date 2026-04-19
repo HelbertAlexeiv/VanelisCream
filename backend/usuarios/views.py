@@ -13,9 +13,11 @@ class RegistroUsuarioAPIView(APIView):
 	authentication_classes = []
 
 	def post(self, request):
+		# El serializer aplica reglas de negocio de registro (password y rol cliente).
 		serializer = RegistroUsuarioSerializer(data=request.data)
 		serializer.is_valid(raise_exception=True)
 		usuario = serializer.save()
+		# Se retorna el usuario serializado para confirmar datos creados en frontend.
 		usuario_data = UsuarioRespuestaSerializer(usuario).data
 		return Response(
 			{
@@ -30,5 +32,6 @@ class UsuarioMeAPIView(APIView):
 	permission_classes = [permissions.IsAuthenticated]
 
 	def get(self, request):
+		# Endpoint de sesion: devuelve el perfil del usuario autenticado por token.
 		usuario_data = UsuarioRespuestaSerializer(request.user).data
 		return Response(usuario_data, status=status.HTTP_200_OK)

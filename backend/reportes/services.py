@@ -13,6 +13,7 @@ from pedidos.models import DetallePedido, Pedido
 class ReportesService:
 	@staticmethod
 	def _parse_int(value, default):
+		# Normaliza parametros de querystring sin romper el flujo por valores invalidos.
 		try:
 			return int(value)
 		except (TypeError, ValueError):
@@ -20,11 +21,13 @@ class ReportesService:
 
 	@staticmethod
 	def _to_aware_datetime(fecha):
+		# Convierte fechas naive a aware en la zona horaria activa de Django.
 		tz = timezone.get_current_timezone()
 		return timezone.make_aware(datetime.combine(fecha, time.min), tz)
 
 	@staticmethod
 	def _month_bounds(year_value, month_value):
+		# Rango semiabierto [inicio, fin) para filtrar por mes sin errores de hora.
 		start_date = date(year_value, month_value, 1)
 		last_day = monthrange(year_value, month_value)[1]
 		end_date = start_date + timedelta(days=last_day)
@@ -38,6 +41,7 @@ class ReportesService:
 
 	@staticmethod
 	def _detalle_valor_expression():
+		# Prioriza subtotal almacenado; si falta, calcula cantidad * precio de forma segura.
 		cero_decimal = Value(Decimal('0.00'), output_field=DecimalField(max_digits=12, decimal_places=2))
 		cantidad = Coalesce(F('cantidad'), Value(0))
 		precio = Coalesce(F('precio_unitario'), cero_decimal)
@@ -55,6 +59,7 @@ class ReportesService:
 		valor_detalle = ReportesService._detalle_valor_expression()
 
 		if periodo == 'semana':
+			# Agrupa por inicio de semana para visualizar tendencia semanal del mes filtrado.
 			agrupado = (
 				detalles_qs
 				.annotate(bucket=TruncWeek('pedido__fecha_creacion'))
@@ -64,6 +69,7 @@ class ReportesService:
 			)
 			etiquetas = [item['bucket'].strftime('%d/%m') for item in agrupado]
 		elif periodo == 'mes':
+			# Para vista mensual se toma el anio completo para comparar meses entre si.
 			start_year, end_year = ReportesService._year_bounds(year_value)
 			agrupado = (
 				DetallePedido.objects
@@ -78,6 +84,7 @@ class ReportesService:
 			)
 			etiquetas = [item['bucket'].strftime('%b') for item in agrupado]
 		else:
+			# Vista diaria: cada punto representa un dia del periodo consultado.
 			agrupado = (
 				detalles_qs
 				.annotate(bucket=TruncDate('pedido__fecha_creacion'))
@@ -102,6 +109,7 @@ class ReportesService:
 
 		year_value = ReportesService._parse_int(anio, current_year)
 		month_value = ReportesService._parse_int(mes, current_month)
+		# Normaliza periodo para evitar consultas con granularidad no soportada.
 		periodo = (periodo or 'dia').lower()
 		if periodo not in {'dia', 'semana', 'mes'}:
 			periodo = 'dia'
@@ -144,6 +152,7 @@ class ReportesService:
 		distribucion_marcas = []
 		for item in marcas_qs:
 			ingresos = item['ingresos'] or Decimal('0.00')
+			# Evita division por cero cuando no hay ventas en el periodo.
 			porcentaje = float((ingresos / total_marcas) * 100) if total_marcas > 0 else 0.0
 			distribucion_marcas.append(
 				{
@@ -183,6 +192,7 @@ class ReportesService:
 
 		umbral_stock = max(0, ReportesService._parse_int(umbral_stock, 15))
 		alertas_limit = max(1, ReportesService._parse_int(alertas_limit, 5))
+		# Se limita la salida para no sobrecargar el dashboard con listas largas.
 		alertas_qs = (
 			Producto.objects
 			.select_related('marca')
