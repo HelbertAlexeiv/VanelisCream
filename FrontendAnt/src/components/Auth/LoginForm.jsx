@@ -145,12 +145,6 @@ const LoginForm = ({ onSwitchToRegister }) => {
         </button>
       </form>
 
-      <div className="auth-links">
-        <a href="#" className="forgot-password-link" id="forgot-password-link">
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
-
       <div className="auth-switch">
         <span>¿No tienes una cuenta?</span>
         <button

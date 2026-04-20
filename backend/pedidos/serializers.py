@@ -12,14 +12,38 @@ class EstadoPedidoSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class DetallePedidoSerializer(serializers.ModelSerializer):
+    producto_nombre = serializers.ReadOnlyField(source='producto.nombre')
+    producto_marca = serializers.ReadOnlyField(source='producto.marca.nombre')
+    producto_imagen = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = DetallePedido
         fields = [
             'producto',
+            'producto_nombre',
+            'producto_imagen',
+            'producto_marca',
             'cantidad',
             'precio_unitario',
             'subtotal'
         ]
+
+    def get_producto_imagen(self, obj):
+        if obj.producto and hasattr(obj.producto, 'imagen') and obj.producto.imagen:
+            imagen = obj.producto.imagen
+            # Si es un campo de archivo (ImageField), usamos la URL
+            if hasattr(imagen, 'url'):
+                try:
+                    request = self.context.get('request')
+                    if request is not None:
+                        return request.build_absolute_uri(imagen.url)
+                    return imagen.url
+                except ValueError:
+                    return None
+            # Si es simplemente un string (URL directa)
+            if isinstance(imagen, str):
+                return imagen
+        return None
 
 
 class PedidoSerializer(serializers.ModelSerializer):

@@ -81,6 +81,7 @@ class DashboardReportesTests(APITestCase):
 			direccion_entrega='Calle 10',
 			total_pedido=total,
 		)
+		# Se usa update directo para fijar fecha_creacion (auto_now_add) en escenarios de prueba.
 		Pedido.objects.filter(id=pedido.id).update(fecha_creacion=fecha)
 		pedido.refresh_from_db()
 
