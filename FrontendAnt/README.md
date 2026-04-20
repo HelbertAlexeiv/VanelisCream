@@ -1,16 +1,30 @@
-# React + Vite
+# Vanelis Cream Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Frontend SPA construido con React + Vite.
 
-Currently, two official plugins are available:
+## Scripts
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `npm run dev`: entorno local
+- `npm run build`: build de producción
+- `npm run preview`: previsualización del build
+- `npm run lint`: validación con ESLint
 
-## React Compiler
+## Variables de entorno
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Crear un archivo `.env` local tomando como base `.env.example`.
 
-## Expanding the ESLint configuration
+Variable requerida:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- `VITE_API_URL`: URL base del backend (por ejemplo `https://api.tudominio.com`)
+
+## Despliegue en Vercel
+
+1. Importar este proyecto en Vercel.
+2. Configurar Root Directory en `FrontendAnt` (si despliegas desde el monorepo).
+3. Agregar variable de entorno `VITE_API_URL` en Project Settings > Environment Variables.
+4. Usar comandos por defecto de Vite:
+	- Build Command: `npm run build`
+	- Output Directory: `dist`
+5. Desplegar.
+
+El archivo `vercel.json` ya incluye rewrite para SPA, permitiendo navegación directa en rutas como `/tienda` o `/admin/dashboard` sin errores 404.
