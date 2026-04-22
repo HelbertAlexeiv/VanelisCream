@@ -4,6 +4,8 @@ from django.conf import settings
 from django.utils import timezone
 from datetime import timedelta
 
+# Aca encontramos los modelos pricipales relacionados con los pedidos
+
 class EstadoPedido(models.Model):
 
     nombre = models.CharField(max_length=50, unique=True)

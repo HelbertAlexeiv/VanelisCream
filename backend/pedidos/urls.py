@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from .views import PedidoViewSet, EstadoPedidoViewSet
 
 
+#Aca registramos los enpoints de la aplicación pedidos
 router = DefaultRouter()
 router.register(r'estado', EstadoPedidoViewSet, basename='estado-pedido')
 router.register(r'', PedidoViewSet, basename='pedido')

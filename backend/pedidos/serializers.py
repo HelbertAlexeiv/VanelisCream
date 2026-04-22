@@ -5,12 +5,13 @@ from django.db import transaction
 from .models import AuditoriaPedido, Pedido, DetallePedido, EstadoPedido
 from usuarios.serializers import UsuarioRespuestaSerializer
 
-
+#Este serializador se encarga de darme la información del estado del pedido
 class EstadoPedidoSerializer(serializers.ModelSerializer):
     class Meta:
         model = EstadoPedido
         fields = '__all__'
 
+# Este serializador se encarga de darme la información del detalle de los pedidos
 class DetallePedidoSerializer(serializers.ModelSerializer):
     producto_nombre = serializers.ReadOnlyField(source='producto.nombre')
     producto_marca = serializers.ReadOnlyField(source='producto.marca.nombre')
