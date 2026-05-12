@@ -15,21 +15,21 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const API_BASE = 'http://localhost:8000';
-  const [period, setPeriod] = useState('dia'); // dia, semana, mes (labels in buttons are capitalized)
-  const [activeTab, setActiveTab] = useState('Dashboard'); // Current view
+  const [period, setPeriod] = useState('dia'); // dia, semana, mes
+  const [activeTab, setActiveTab] = useState('Dashboard'); // Vista actual
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
-      // 1. Fetch dashboard stats
+      // Cargar estadísticas del dashboard
       const result = await reportService.getDashboardData({ periodo: period });
       
-      // 2. Fetch ALL orders to calculate REAL pending (sync with Dispatch view)
-      // Note: We fetch a larger page size or handle filtering to match Dispatch logic
+      // Obtener todos los pedidos para calcular los pendientes reales
+      // Nota: Se usa un page_size grande para coincidir con la vista de Despacho
       const pendingRes = await api.get('/api/pedidos/', { params: { page_size: 100 } });
       const allOrders = Array.isArray(pendingRes.data) ? pendingRes.data : (pendingRes.data.results || []);
       
-      // APPLY SAME FILTER AS ORDERDISPATCH.JSX
+      // Aplicar mismo filtro que OrderDispatch
       const realPendingCount = allOrders.filter(order => {
         const status = order.estado?.nombre?.toLowerCase();
         return status === 'recibido' || status === 'preparando' || status === 'en camino';
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
     );
   }
 
-  // Mapping data from API to Recharts format
+  // Mapear datos de la API al formato de Recharts
   const brandData = data?.distribucion_marcas?.map(item => ({
     name: item.marca,
     value: item.porcentaje
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
     { name: '30', value: 1400 },
   ];
 
-  // Utility to handle both local media paths and external URLs
+  // Utilidad para manejar URLs tanto locales como externas
   const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith('http')) return path;
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
     <AdminLayout>
       <div className="dashboard-page">
         
-        {/* Top Stat Cards Section */}
+        {/* Tarjetas de Estadísticas */}
         <section className="stats-grid">
            <div className="stat-card red-gradient-card card-shadow-soft">
               <div className="stat-icon-wrapper">

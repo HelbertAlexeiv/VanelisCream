@@ -12,7 +12,7 @@ const CatalogPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [totalItems, setTotalItems] = useState(0);
   
-  // API Query Params State
+  // Estado de los parámetros de búsqueda y filtros
   const [filters, setFilters] = useState({
     q: '',
     marca: '',
@@ -48,7 +48,7 @@ const CatalogPage = () => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setFilters(prev => ({ ...prev, q: searchTerm, page: 1 }));
-    }, 500); // 500ms debounce
+    }, 500); // Retraso de 500ms
     return () => clearTimeout(timer);
   }, [searchTerm]);
 

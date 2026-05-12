@@ -27,7 +27,7 @@ const ProductCard = ({ producto }) => {
           alt={producto.nombre} 
           className="product-image"
           onError={(e) => {
-            e.target.src = 'https://via.placeholder.com/200x250?text=Helado'; // Fallback
+            e.target.src = 'https://via.placeholder.com/200x250?text=Helado'; // Imagen por defecto
           }}
           onClick={handleCardClick}
           style={{ cursor: 'pointer' }}

@@ -4,7 +4,7 @@ const CartContext = createContext();
 
 export const useCart = () => useContext(CartContext);
 
-// Initial state loads from localStorage if available
+// Cargar estado inicial desde localStorage si existe
 const initialState = {
   items: JSON.parse(localStorage.getItem('cartItems')) || [],
 };
@@ -15,14 +15,14 @@ const cartReducer = (state, action) => {
     case 'ADD_ITEM':
       const existingItemIndex = state.items.findIndex(item => item.id === action.payload.id);
       if (existingItemIndex > -1) {
-        // Item exists: update quantity immutably
+        // El producto ya existe: actualizar cantidad
         newItems = [...state.items];
         newItems[existingItemIndex] = {
           ...newItems[existingItemIndex],
           quantity: newItems[existingItemIndex].quantity + action.payload.quantity,
         };
       } else {
-        // New item
+        // Producto nuevo
         newItems = [...state.items, action.payload];
       }
       return { ...state, items: newItems };
@@ -50,15 +50,15 @@ const cartReducer = (state, action) => {
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  // Sync to localStorage every time the cart items change
+  // Sincronizar localStorage cada vez que cambien los productos
   useEffect(() => {
     localStorage.setItem('cartItems', JSON.stringify(state.items));
   }, [state.items]);
 
-  // Derived states
+  // Estados derivados
   const cartCount = state.items.reduce((total, item) => total + item.quantity, 0);
   const cartSubtotal = state.items.reduce((total, item) => total + (item.precio * item.quantity), 0);
-  // Total logic can include taxes/shipping if needed, for now equal to subtotal
+  // La lógica del total puede incluir impuestos o envío en el futuro
   const cartTotal = cartSubtotal; 
 
   const addToCart = (product, quantity = 1) => {

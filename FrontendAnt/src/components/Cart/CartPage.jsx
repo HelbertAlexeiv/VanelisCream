@@ -12,7 +12,7 @@ const CartPage = () => {
   const { cartItems, cartSubtotal, cartTotal, updateQuantity, removeFromCart, clearCart } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   
-  // Delivery Form State
+  // Estado del formulario de entrega
   const [deliveryData, setDeliveryData] = useState({
     nombre: '',
     direccion: '',
@@ -23,7 +23,7 @@ const CartPage = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Scroll to top and Load User Profile
+  // Cargar perfil del usuario al inicio
   useEffect(() => {
     window.scrollTo(0, 0);
     
@@ -45,7 +45,7 @@ const CartPage = () => {
     loadProfile();
   }, []);
 
-  // Handle Search interaction from Header: redirect back to Catalog
+  // Redirigir al catálogo al usar la barra de búsqueda
   useEffect(() => {
     if (searchTerm) {
       const timer = setTimeout(() => {
@@ -66,7 +66,6 @@ const CartPage = () => {
       return;
     }
 
-    // Basic validation
     if (!deliveryData.nombre || !deliveryData.direccion || !deliveryData.ciudad || !deliveryData.telefono) {
       alert("Por favor llena todos los campos obligatorios de entrega.");
       return;
@@ -74,10 +73,9 @@ const CartPage = () => {
 
     setIsSubmitting(true);
     
-    // Combine fields into a single address string for the backend as Pedido model requires
+    // Concatenar campos de dirección para cumplir con el modelo Pedido
     const fullAddress = `${deliveryData.direccion}, ${deliveryData.barrio ? deliveryData.barrio + ', ' : ''}${deliveryData.ciudad}${deliveryData.instrucciones ? ' (Instrucciones: ' + deliveryData.instrucciones + ')' : ''}`;
 
-    // Construct payload per latest backend findings (PedidoCreateSerializer)
     const payload = {
       direccion_entrega: fullAddress,
       total_pedido: cartTotal,
@@ -97,7 +95,7 @@ const CartPage = () => {
       
       // FALLBACK: If the response is missing the ID, fetch the user's latest order
       if (!orderId) {
-        console.warn("Backend didn't return an order ID. Attempting recovery...");
+        cEn caso de que la respuesta no incluya el ID, buscar el pedido más reciente
         try {
           const myOrders = await orderService.getUserOrders({ page_size: 1 });
           const latest = Array.isArray(myOrders) ? myOrders[0] : (myOrders.results ? myOrders.results[0] : null);
@@ -105,10 +103,10 @@ const CartPage = () => {
             orderId = latest.id;
             console.log("Success: Recovered ID", orderId);
           }
+        } catch (e) {Éxito: ID recuperado", orderId);
+          }
         } catch (e) {
-          console.error("Failed to recover order ID:", e);
-        }
-      }
+          console.error("Error al recuperar el ID del pedido
 
       const orderDetails = {
         id: orderId,
@@ -145,10 +143,8 @@ const CartPage = () => {
 
         <div className="cart-content-grid">
           
-          {/* Left Column: Items and Form */}
           <div className="cart-left-col">
             
-            {/* Products Section */}
             <section className="cart-section card-shadow-soft">
               <h2 className="section-heading">Tus Productos</h2>
               
@@ -174,7 +170,7 @@ const CartPage = () => {
                         <div className="item-meta">
                           {/* Presentacion is mocked since we didn't strictly save it in product detail, but simulated it for fidelity */}
                           <span className="item-presentation">1 Unidad</span>
-                          <span className="item-separator">|</span>
+                          <span classNamón simulada por propósitos visuales
                           <span className="item-unit-price">${item.precio.toLocaleString('es-CO')} c/u</span>
                         </div>
                       </div>
@@ -200,7 +196,6 @@ const CartPage = () => {
 
             {/* Delivery Form Section */}
             <section className="cart-section card-shadow-soft">
-              <h2 className="section-heading">Detalles de Entrega</h2>
               <form className="delivery-form" onSubmit={(e) => e.preventDefault()}>
                 <div className="form-row two-cols">
                   <input type="text" name="nombre" placeholder="Nombre Completo" value={deliveryData.nombre} onChange={handleInputChange} required />
@@ -222,7 +217,6 @@ const CartPage = () => {
           {/* Right Column: Order Summary */}
           <div className="cart-right-col">
             <section className="summary-card card-shadow-soft">
-              <h2 className="section-heading">Resumen de Costos</h2>
               
               <div className="summary-row">
                 <span className="summary-label">Subtotal</span>

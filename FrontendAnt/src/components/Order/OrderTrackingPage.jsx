@@ -30,7 +30,7 @@ const OrderTrackingPage = () => {
     return Math.max(0, diff);
   };
 
-  // Load Initial Order
+  // Cargar pedido inicial
   useEffect(() => {
     const fetchOrder = async () => {
       window.scrollTo(0, 0);
@@ -38,12 +38,12 @@ const OrderTrackingPage = () => {
         let data;
         let effectiveId = id;
         
-        // Handle "undefined" ID from malformed navigation
+        // Manejar ID inválido
         if (!effectiveId || effectiveId === 'undefined') {
           if (location.state?.orderDetails?.id) {
             effectiveId = location.state.orderDetails.id;
           } else {
-            // If still no ID, we can't fetch. Error state.
+            // Sin ID, no puede continuar
             setLoading(false);
             return;
           }
@@ -52,7 +52,7 @@ const OrderTrackingPage = () => {
         data = await orderService.getOrderById(effectiveId);
         const orderData = data;
         
-        // HYDRATION: Fetch full product details for each item
+        // Obtener la información completa de cada producto
         const itemsToHydrate = orderData.detalles || orderData.items || [];
         const hydratedItems = await Promise.all(
           itemsToHydrate.map(async (item) => {
@@ -65,11 +65,10 @@ const OrderTrackingPage = () => {
                 producto_nombre: pData.nombre,
                 producto_imagen: pData.imagen,
                 producto_marca: pData.marca?.nombre,
-                // Fallback for names if already present or cache
                 nombre: pData.nombre
               };
             } catch (e) {
-              console.warn("Could not hydrate item:", item.producto);
+              console.warn("No se pudo obtener información del producto:", item.producto);
               return item;
             }
           })
@@ -78,11 +77,11 @@ const OrderTrackingPage = () => {
         const finalOrder = { ...orderData, items: hydratedItems };
         setOrder(finalOrder);
         
-        // Calculate dynamic time from backend limit
+        // Calcular tiempo de forma dinámica 
         const remaining = calculateTimeRemaining(finalOrder.fecha_limite_cancelacion);
         if (remaining !== null) setTimeLeft(remaining);
         
-        // Find index of current status (case-insensitive)
+        // Buscar el índice del estado actual (ignorando mayúsculas)
         const statusName = (finalOrder.estado?.nombre || finalOrder.status || '').toLowerCase();
         const stepIdx = ORDER_STEPS.findIndex(s => s.toLowerCase() === statusName);
         setCurrentStepIndex(stepIdx !== -1 ? stepIdx : 0);
@@ -99,7 +98,7 @@ const OrderTrackingPage = () => {
     fetchOrder();
   }, [id, location.state]);
 
-  // Polling for real-time manual updates from backend
+  // Consultar actualizaciones manualmente si no hay websockets
   useEffect(() => {
     const effectiveId = (id && id !== 'undefined') ? id : order?.id;
     if (loading || isCancelled || currentStepIndex >= 3 || !effectiveId) return;
@@ -124,7 +123,7 @@ const OrderTrackingPage = () => {
     return () => clearInterval(pollInterval);
   }, [loading, isCancelled, currentStepIndex, id, order?.id]);
 
-  // Handle countdown timer 
+  // Temporizador 
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0 || isCancelled || currentStepIndex >= 1) return;
 
@@ -148,7 +147,7 @@ const OrderTrackingPage = () => {
     }
   };
 
-  // Formatting Time Left MM:SS
+  // Formatear el tiempo en MM:SS
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;

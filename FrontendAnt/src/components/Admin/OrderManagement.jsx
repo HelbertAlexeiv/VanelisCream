@@ -42,7 +42,7 @@ const OrderManagement = () => {
         if (clientMatch?.cliente?.id) potentialClientId = clientMatch.cliente.id;
       }
       
-      // MAP STATUS TO ID: Backend usually wants a number (1, 2, 3...)
+      // MAPEAR ESTADOS A IDS
       const statusMap = {
         'recibido': 1,
         'preparando': 2,
@@ -87,7 +87,7 @@ const OrderManagement = () => {
         prev = !!data.previous;
       }
 
-      // ULTIMATE RESCUE: If API search returned 0 but apiSearch is a number, try fetching that exact ID
+      // Si la búsqueda por la API retorna 0 pero es un número, intentar buscar por ID exacto
       if (newOrders.length === 0 && apiSearch && !isNaN(apiSearch) && page === 1) {
         try {
           const directMatch = await pedidoService.getPedidoById(parseInt(apiSearch));
@@ -121,15 +121,15 @@ const OrderManagement = () => {
     fetchOrders(1);
   }, []); // Only on mount
 
-  // Debounced search trigger
+  // Ejecutar búsqueda con retraso
   useEffect(() => {
     if (searchTerm || statusFilter || dateFrom || dateTo) {
       const delayDebounceFn = setTimeout(() => {
         fetchOrders(1);
-      }, 500); // Wait 500ms before searching
+      }, 500); // Esperar 500ms
       return () => clearTimeout(delayDebounceFn);
     } else {
-      // If everything cleared, refresh once
+      // Si se limpian, refrescar
       fetchOrders(1);
     }
   }, [searchTerm, statusFilter, dateFrom, dateTo]);
@@ -151,7 +151,7 @@ const OrderManagement = () => {
                 return { 
                   ...item, 
                   product_data: fullProd, 
-                  nombre_producto: fullProd.nombre // Force the name for the table 
+                  nombre_producto: fullProd.nombre // Forzar el nombre para la tabla
                 };
               }
               return item;

@@ -22,19 +22,19 @@ const ProductDetail = () => {
     const fetchProductAndRelated = async () => {
       setLoading(true);
       setLoadingRelated(true);
-      window.scrollTo(0, 0); // Reset scroll position when loading a new product
+      window.scrollTo(0, 0); // Reiniciar posición del scroll al cargar un producto nuevo
 
       try {
-        // Fetch principal product
+        // Cargar el producto principal
         const productData = await productService.getProductById(id);
         setProduct(productData);
         setLoading(false);
 
-        // Fetch related products (RF3) by brand
+        // Cargar productos relacionados por marca (RF3)
         if (productData?.marca?.id) {
           try {
             const relatedData = await productService.getProducts({ marca: productData.marca.id, page_size: 4 });
-            // Filter out the current product from related
+            // Excluir el producto actual de los relacionados
             const filteredRelated = (relatedData.results || []).filter(p => p.id !== productData.id).slice(0, 3);
             setRelatedProducts(filteredRelated);
           } catch (relatedErr) {
@@ -52,13 +52,9 @@ const ProductDetail = () => {
     fetchProductAndRelated();
   }, [id]);
 
-  // Handle Search interaction from Header: redirect back to Catalog
+  // Redirigir al catálogo al buscar
   useEffect(() => {
     if (searchTerm) {
-      // In a real scenario we'd pass state to the router or rely on global state.
-      // For this isolated view, logging the behavior and letting the parent catalog component handle its own state is cleaner, 
-      // but to simulate immediate search interaction we jump to `/tienda` with a generic redirect if desired.
-      // Here we just navigate back to store if user type to search.
       const timer = setTimeout(() => {
         navigate('/tienda', { state: { searchInit: searchTerm } });
       }, 500);

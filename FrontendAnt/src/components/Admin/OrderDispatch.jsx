@@ -14,17 +14,14 @@ const OrderDispatch = () => {
   const fetchPending = useCallback(async () => {
     setLoading(true);
     try {
-      // Fetch all active orders in the dispatch workflow
-      // Note: We fetch multiple statuses to ensure persistence until "entregado"
+      // Solicitar pedidos activos
       const data = await pedidoService.getAllPedidos({ 
-        // Backend filtering for multiple statuses (if supported) or we handle in frontend
-        // Assuming your backend supports a list of IDs or we refine current logic
         ordering: '-id' 
       });
       
       const list = Array.isArray(data) ? data : (data.results || []);
       
-      // Filter logically: only those NOT delivered and NOT cancelled
+      // Filtrar, ignorando cancelados y entregados
       const activeList = list.filter(order => {
         const status = order.estado?.nombre?.toLowerCase();
         return status === 'recibido' || status === 'preparando' || status === 'en camino';

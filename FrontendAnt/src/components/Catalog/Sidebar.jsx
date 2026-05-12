@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './Sidebar.css';
 
 const Sidebar = ({ filters, onFilterChange, onClearFilters }) => {
-  const [isOpen, setIsOpen] = useState(true); // For mobile toggle
+  const [isOpen, setIsOpen] = useState(true); // Control de estado para móvil
 
   const marcasList = [
     { id: '1', nombre: 'Crem Helado' },
@@ -54,7 +54,6 @@ const Sidebar = ({ filters, onFilterChange, onClearFilters }) => {
       <aside className={`catalog-sidebar ${isOpen ? 'open' : ''}`}>
         <h2 className="sidebar-title">FILTROS</h2>
         
-        {/* MARCA Filter */}
         <div className="filter-group">
           <div className="filter-header">
             <div className="filter-header-title">
@@ -81,7 +80,6 @@ const Sidebar = ({ filters, onFilterChange, onClearFilters }) => {
         </div>
 
         {/* PRECIO Filter */}
-        <div className="filter-group">
           <div className="filter-header">
             <div className="filter-header-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line></svg>
@@ -113,7 +111,6 @@ const Sidebar = ({ filters, onFilterChange, onClearFilters }) => {
         </div>
 
         {/* PRESENTACIÓN Filter */}
-        <div className="filter-group">
           <div className="filter-header">
             <div className="filter-header-title">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D32F2F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
@@ -142,7 +139,6 @@ const Sidebar = ({ filters, onFilterChange, onClearFilters }) => {
 
         {/* Clear Filters Button */}
         <div style={{ padding: '0 24px', marginTop: '30px' }}>
-          <button 
             type="button" 
             onClick={onClearFilters} 
             className="clear-all-filters-btn"
